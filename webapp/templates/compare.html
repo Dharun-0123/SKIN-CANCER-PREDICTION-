@@ -1,0 +1,447 @@
+{% extends 'base.html' %}
+
+{% block title %}Compare Analyses - SkinCare AI{% endblock %}
+
+{% block extra_css %}
+<style>
+    main {
+        margin-top: 100px;
+        padding: 2rem;
+        max-width: 1400px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .compare-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+
+    .compare-header h1 {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 2.5rem;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+    }
+
+    .compare-header p {
+        color: var(--text-secondary);
+        font-size: 1.1rem;
+    }
+
+    .selection-card {
+        background: var(--bg-card);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(168, 85, 247, 0.3);
+        border-radius: 20px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .selection-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid rgba(168, 85, 247, 0.2);
+    }
+
+    .selection-title {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 1.3rem;
+        color: var(--text-primary);
+    }
+
+    .analyses-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 2rem;
+    }
+
+    .analysis-item {
+        background: rgba(26, 26, 36, 0.6);
+        border: 2px solid rgba(168, 85, 247, 0.3);
+        border-radius: 12px;
+        padding: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+
+    .analysis-item:hover {
+        border-color: var(--accent-cyan);
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px var(--glow-cyan);
+    }
+
+    .analysis-item.selected {
+        border-color: var(--accent-purple);
+        background: rgba(168, 85, 247, 0.2);
+        box-shadow: 0 0 30px var(--glow-purple);
+    }
+
+    .analysis-checkbox {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        width: 24px;
+        height: 24px;
+        cursor: pointer;
+    }
+
+    .analysis-image {
+        width: 100%;
+        height: 150px;
+        object-fit: cover;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+    }
+
+    .analysis-date {
+        color: var(--text-secondary);
+        font-size: 0.85rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .analysis-label {
+        color: var(--text-primary);
+        font-weight: 600;
+        font-size: 0.9rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .compare-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .btn-compare {
+        padding: 1rem 2rem;
+        background: var(--gradient-primary);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-compare:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 30px var(--glow-purple);
+    }
+
+    .btn-compare:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .btn-export {
+        padding: 1rem 2rem;
+        background: var(--gradient-secondary);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-export:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 30px var(--glow-blue);
+    }
+
+    .comparison-results {
+        display: none;
+        margin-top: 2rem;
+    }
+
+    .comparison-results.active {
+        display: block;
+    }
+
+    .comparison-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 2.5rem;
+        margin-top: 2rem;
+    }
+
+    .comparison-card {
+        background: var(--bg-card);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(168, 85, 247, 0.3);
+        border-radius: 16px;
+        padding: 1.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .comparison-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px var(--glow-purple);
+    }
+
+    .comparison-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid rgba(168, 85, 247, 0.2);
+    }
+
+    .comparison-number {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 1.5rem;
+        color: var(--accent-cyan);
+    }
+
+    .comparison-image {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        border-radius: 12px;
+        margin-bottom: 1rem;
+    }
+
+    .comparison-info {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .comparison-label {
+        color: var(--text-primary);
+        font-weight: 600;
+        font-size: 1rem;
+        margin-top: 1rem;
+        padding: 0.8rem;
+        background: rgba(168, 85, 247, 0.1);
+        border-radius: 8px;
+        border-left: 4px solid var(--accent-purple);
+    }
+
+    .no-data {
+        text-align: center;
+        padding: 3rem;
+        color: var(--text-secondary);
+    }
+
+    .no-data i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        color: var(--accent-purple);
+        opacity: 0.5;
+    }
+
+    @media (max-width: 768px) {
+        main {
+            margin-top: 80px;
+            padding: 1rem;
+        }
+
+        .compare-header h1 {
+            font-size: 2rem;
+        }
+
+        .analyses-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .comparison-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .compare-actions {
+            flex-direction: column;
+        }
+
+        .btn-compare, .btn-export {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="compare-header">
+    <h1><i class="fas fa-balance-scale"></i> Compare Analyses</h1>
+    <p>Select multiple analyses to compare side-by-side</p>
+</div>
+
+{% if predictions %}
+<div class="selection-card">
+    <div class="selection-header">
+        <h3 class="selection-title">Select Analyses to Compare</h3>
+        <span id="selectedCount" style="color: var(--accent-cyan); font-weight: 600;">0 selected</span>
+    </div>
+
+    <div class="analyses-grid">
+        {% for prediction in predictions %}
+        <div class="analysis-item" data-id="{{ prediction.id }}" onclick="toggleSelection({{ prediction.id }})">
+            <input type="checkbox" class="analysis-checkbox" id="check-{{ prediction.id }}" onclick="event.stopPropagation(); toggleSelection({{ prediction.id }})">
+            <img src="{{ prediction.image.url }}" alt="Analysis" class="analysis-image">
+            <div class="analysis-date">{{ prediction.created_at|date:"M d, Y - H:i" }}</div>
+            <div class="analysis-label">{{ prediction.label }}</div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="compare-actions">
+        <button class="btn-compare" id="compareBtn" onclick="compareSelected()" disabled>
+            <i class="fas fa-balance-scale"></i> Compare Selected
+        </button>
+        <button class="btn-export" onclick="exportComparison()">
+            <i class="fas fa-file-pdf"></i> Export as PDF
+        </button>
+    </div>
+</div>
+
+<div class="comparison-results" id="comparisonResults">
+    <div class="selection-card">
+        <div class="selection-header">
+            <h3 class="selection-title">Comparison Results</h3>
+            <button class="btn-compare" onclick="clearComparison()" style="padding: 0.5rem 1rem; font-size: 0.9rem;">
+                <i class="fas fa-times"></i> Clear
+            </button>
+        </div>
+        <div class="comparison-grid" id="comparisonGrid"></div>
+    </div>
+</div>
+
+{% else %}
+<div class="selection-card">
+    <div class="no-data">
+        <i class="fas fa-balance-scale"></i>
+        <h3 style="color: var(--text-primary); margin-bottom: 1rem;">No Analyses Available</h3>
+        <p>You need at least 2 analyses to use the comparison feature.</p>
+        <a href="{% url 'analyze' %}" class="btn-compare" style="margin-top: 1.5rem; text-decoration: none;">
+            <i class="fas fa-microscope"></i> Start Analyzing
+        </a>
+    </div>
+</div>
+{% endif %}
+
+<script>
+let selectedIds = [];
+
+function toggleSelection(id) {
+    const item = document.querySelector(`.analysis-item[data-id="${id}"]`);
+    const checkbox = document.getElementById(`check-${id}`);
+    
+    if (selectedIds.includes(id)) {
+        selectedIds = selectedIds.filter(i => i !== id);
+        item.classList.remove('selected');
+        checkbox.checked = false;
+    } else {
+        selectedIds.push(id);
+        item.classList.add('selected');
+        checkbox.checked = true;
+    }
+    
+    updateSelectedCount();
+}
+
+function updateSelectedCount() {
+    const count = selectedIds.length;
+    document.getElementById('selectedCount').textContent = `${count} selected`;
+    document.getElementById('compareBtn').disabled = count < 2;
+}
+
+function compareSelected() {
+    if (selectedIds.length < 2) {
+        alert('Please select at least 2 analyses to compare');
+        return;
+    }
+    
+    // Fetch comparison data
+    fetch('/compare/data/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify({ ids: selectedIds })
+    })
+    .then(response => response.json())
+    .then(data => {
+        displayComparison(data.predictions);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error loading comparison data');
+    });
+}
+
+function displayComparison(predictions) {
+    const grid = document.getElementById('comparisonGrid');
+    grid.innerHTML = '';
+    
+    predictions.forEach((pred, index) => {
+        const card = document.createElement('div');
+        card.className = 'comparison-card';
+        card.innerHTML = `
+            <div class="comparison-card-header">
+                <span class="comparison-number">Analysis #${index + 1}</span>
+            </div>
+            <img src="${pred.image_url}" alt="Analysis" class="comparison-image">
+            <div class="comparison-info"><i class="fas fa-calendar"></i> ${pred.date}</div>
+            <div class="comparison-label">${pred.label}</div>
+        `;
+        grid.appendChild(card);
+    });
+    
+    document.getElementById('comparisonResults').classList.add('active');
+    document.getElementById('comparisonResults').scrollIntoView({ behavior: 'smooth' });
+}
+
+function clearComparison() {
+    document.getElementById('comparisonResults').classList.remove('active');
+    document.getElementById('comparisonGrid').innerHTML = '';
+}
+
+function exportComparison() {
+    if (selectedIds.length === 0) {
+        alert('Please select at least one analysis to export');
+        return;
+    }
+    
+    // Create form and submit
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '/export/pdf/';
+    
+    const csrfInput = document.createElement('input');
+    csrfInput.type = 'hidden';
+    csrfInput.name = 'csrfmiddlewaretoken';
+    csrfInput.value = '{{ csrf_token }}';
+    form.appendChild(csrfInput);
+    
+    const idsInput = document.createElement('input');
+    idsInput.type = 'hidden';
+    idsInput.name = 'ids';
+    idsInput.value = JSON.stringify(selectedIds);
+    form.appendChild(idsInput);
+    
+    document.body.appendChild(form);
+    form.submit();
+    document.body.removeChild(form);
+}
+</script>
+{% endblock %}

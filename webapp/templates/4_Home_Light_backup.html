@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - SkinCare AI{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div style="background: linear-gradient(135deg, #007B8E 0%, #3BCBB0 100%); color: white; padding: 4rem 2rem; border-radius: 20px; margin-bottom: 3rem; text-align: center;">
+        <h1 style="font-size: 3rem; font-weight: 800; margin-bottom: 1rem;">Welcome, {{ user.username }}!</h1>
+        <p style="font-size: 1.2rem; margin-bottom: 2rem;">Advanced AI-Powered Skin Cancer Detection</p>
+        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+            <a href="{% url 'analyze' %}" class="btn btn-primary" style="background: white; color: #007B8E;">
+                <i class="fas fa-upload"></i> Analyze Image
+            </a>
+            <a href="{% url 'history' %}" class="btn btn-secondary">
+                <i class="fas fa-history"></i> View History
+            </a>
+        </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; margin-bottom: 3rem;">
+        <div class="card" style="text-align: center;">
+            <div style="font-size: 3rem; font-weight: 800; background: linear-gradient(135deg, #007B8E 0%, #3BCBB0 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">{{ prediction_count }}</div>
+            <div style="color: #64748B; font-weight: 600; margin-top: 0.5rem;">Your Analyses</div>
+        </div>
+        <div class="card" style="text-align: center;">
+            <div style="font-size: 3rem; font-weight: 800; background: linear-gradient(135deg, #007B8E 0%, #3BCBB0 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">92%</div>
+            <div style="color: #64748B; font-weight: 600; margin-top: 0.5rem;">Model Accuracy</div>
+        </div>
+        <div class="card" style="text-align: center;">
+            <div style="font-size: 3rem; font-weight: 800; background: linear-gradient(135deg, #007B8E 0%, #3BCBB0 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">8</div>
+            <div style="color: #64748B; font-weight: 600; margin-top: 0.5rem;">Classifications</div>
+        </div>
+        <div class="card" style="text-align: center;">
+            <div style="font-size: 3rem; font-weight: 800; background: linear-gradient(135deg, #007B8E 0%, #3BCBB0 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">&lt;2s</div>
+            <div style="color: #64748B; font-weight: 600; margin-top: 0.5rem;">Analysis Time</div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2><i class="fas fa-microscope"></i> How It Works</h2>
+        <p style="color: #64748B; margin: 1rem 0;">Our AI system uses Convolutional Neural Networks to analyze skin lesions.</p>
+        <ol style="padding-left: 2rem;">
+            <li style="margin: 0.5rem 0;"><strong>Upload:</strong> Select a clear image of the skin lesion</li>
+            <li style="margin: 0.5rem 0;"><strong>AI Analysis:</strong> Our CNN model processes the image</li>
+            <li style="margin: 0.5rem 0;"><strong>Get Results:</strong> Receive classification with medical information</li>
+            <li style="margin: 0.5rem 0;"><strong>Track History:</strong> All analyses are saved to your account</li>
+        </ol>
+    </div>
+
+    <div class="card" style="background: linear-gradient(135deg, #EFB13D 0%, #FF9B53 100%); color: white; text-align: center;">
+        <h2 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 1rem;">Ready to Get Started?</h2>
+        <p style="font-size: 1.2rem; margin-bottom: 2rem;">Upload your first image and get instant AI-powered analysis</p>
+        <a href="{% url 'analyze' %}" style="background: white; color: #EFB13D; padding: 1rem 2rem; border-radius: 8px; text-decoration: none; display: inline-block; font-weight: 600;">
+            <i class="fas fa-microscope"></i> Start Analysis Now
+        </a>
+    </div>
+
+    <div class="card" style="border-left: 4px solid #E57373;">
+        <h2><i class="fas fa-exclamation-triangle" style="color: #E57373;"></i> Important Disclaimer</h2>
+        <p><strong>This system is for educational purposes only.</strong> It is not a substitute for professional medical advice. Always consult a qualified healthcare provider for medical concerns.</p>
+    </div>
+</div>
+{% endblock %}

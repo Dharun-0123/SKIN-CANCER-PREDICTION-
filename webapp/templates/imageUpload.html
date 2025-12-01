@@ -1,0 +1,245 @@
+{% extends 'base.html' %}
+
+
+
+{% block title %}Patient Analysis - SkinCare AI{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Override for dark theme patient form */
+    .patient-card {
+        background: var(--bg-card);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(168, 85, 247, 0.3);
+    }
+    
+    .patient-header {
+        background: var(--gradient-primary);
+    }
+    
+    .form-control {
+        background: rgba(26, 26, 36, 0.6);
+        border: 1px solid rgba(168, 85, 247, 0.3);
+        color: var(--text-primary);
+    }
+    
+    .form-control:focus {
+        border-color: var(--accent-cyan);
+        box-shadow: 0 0 20px var(--glow-cyan);
+    }
+    
+    .image-upload-zone {
+        background: rgba(26, 26, 36, 0.6);
+        border-color: rgba(168, 85, 247, 0.3);
+    }
+    
+    .image-upload-zone:hover {
+        border-color: var(--accent-cyan);
+        background: rgba(168, 85, 247, 0.1);
+    }
+
+.patient-form-container {
+        max-width: 1000px;
+        margin: 2rem auto;
+    }
+
+    .patient-card {
+        background: linear-gradient(180deg, #FFFFFF 0%, #F9FBFC 100%);
+        border: 1px solid rgba(0,124,145,0.15);
+        border-radius: 20px;
+        box-shadow: var(--shadow-card-hover);
+        overflow: hidden;
+    }
+
+    .patient-header {
+        background: var(--gradient-primary);
+        padding: 2rem;
+        text-align: center;
+        color: var(--text-light);
+        box-shadow: var(--shadow-hero);
+    }
+
+    .patient-header h2 {
+        font-size: 2.2rem;
+        font-weight: 800;
+        margin-bottom: 0.5rem;
+        letter-spacing: -0.01em;
+    }
+
+    .patient-body {
+        padding: 2.5rem;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+    }
+
+    .form-column {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: var(--text-dark);
+        font-size: 0.9rem;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.9rem;
+        border: 2px solid #E2E8F0;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: var(--color-primary-end);
+        box-shadow: 0 0 0 3px rgba(59,203,176,0.25);
+    }
+
+    .image-upload-zone {
+        border: 3px dashed #E0E6E8;
+        border-radius: 12px;
+        padding: 2rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: var(--surface-2);
+    }
+
+    .image-upload-zone:hover {
+        border-color: var(--color-primary-end);
+        background: rgba(59,203,176,0.05);
+    }
+
+    .image-preview {
+        max-width: 100%;
+        max-height: 300px;
+        border-radius: 12px;
+        margin-top: 1rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+
+    .btn-group {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    @media (max-width: 768px) {
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+
+
+{% block content %}
+<div class="patient-form-container">
+    <div class="patient-card">
+        <div class="patient-header">
+            <i class="fas fa-user-md" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+            <h2>Patient Information Form</h2>
+            <p>Enter patient details for skin lesion analysis</p>
+        </div>
+
+        <div class="patient-body">
+            <form method="post" action="{% url 'patientResult' %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="form-row">
+                    <div class="form-column">
+                        <div class="form-group">
+                            <label for="patientID"><i class="fas fa-id-card"></i> Patient ID</label>
+                            <input type="text" class="form-control" id="patientID" name="patientID" placeholder="Enter Patient ID">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="name"><i class="fas fa-user"></i> Name</label>
+                            <input type="text" class="form-control" id="name" name="name" placeholder="Enter Name">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="age"><i class="fas fa-birthday-cake"></i> Age</label>
+                            <input type="number" class="form-control" id="age" name="age" placeholder="Enter Age">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="bloodGroup"><i class="fas fa-tint"></i> Blood Group</label>
+                            <select class="form-control" id="bloodGroup" name="bloodGroup">
+                                <option value="">Select Blood Group</option>
+                                <option value="A+">A+</option>
+                                <option value="A-">A-</option>
+                                <option value="B+">B+</option>
+                                <option value="B-">B-</option>
+                                <option value="O+">O+</option>
+                                <option value="O-">O-</option>
+                                <option value="AB+">AB+</option>
+                                <option value="AB-">AB-</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-column">
+                        <div class="form-group">
+                            <label><i class="fas fa-image"></i> Upload Skin Lesion Image *</label>
+                            <div class="image-upload-zone" onclick="document.getElementById('imageInput').click()">
+                                <i class="fas fa-cloud-upload-alt" style="font-size: 3rem; background: var(--gradient-primary); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;"></i>
+                                <p>Click to upload image</p>
+                                <input type="file" id="imageInput" name="image" accept="image/*" style="display: none;" onchange="previewImage(event)" required>
+                            </div>
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-outline" onclick="clearImage()" style="flex: 1;">
+                                    <i class="fas fa-times"></i> Clear
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="previewContainer" style="display: none;">
+                            <img id="imagePreview" class="image-preview" alt="Preview">
+                        </div>
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin-top: 2rem;">
+                    <button type="submit" class="btn btn-primary" style="padding: 1rem 3rem; font-size: 1.1rem;">
+                        <i class="fas fa-microscope"></i> Analyze Image
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function previewImage(event) {
+        const input = event.target;
+        const preview = document.getElementById('imagePreview');
+        const container = document.getElementById('previewContainer');
+
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                container.style.display = 'block';
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function clearImage() {
+        document.getElementById('imageInput').value = '';
+        document.getElementById('previewContainer').style.display = 'none';
+    }
+</script>
+{% endblock %}

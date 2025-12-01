@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 50px;
+            text-align: center;
+        }
+        h1 {
+            font-size: 3rem;
+        }
+    </style>
+</head>
+<body>
+    <h1>✅ Test Page Works!</h1>
+    <p>If you see this, Django is rendering templates correctly.</p>
+    <p>User: {{ user }}</p>
+    <p>Authenticated: {{ user.is_authenticated }}</p>
+    <a href="/home/" style="color: white; font-size: 1.5rem;">Go to Home</a>
+</body>
+</html>

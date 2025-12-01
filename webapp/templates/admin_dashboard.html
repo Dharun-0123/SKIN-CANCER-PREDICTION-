@@ -1,0 +1,586 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard - SkinCare AI{% endblock %}
+
+{% block extra_css %}
+<style>
+    main {
+        margin-top: 100px;
+        padding: 2rem;
+        max-width: 1600px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .admin-header {
+        text-align: center;
+        margin-bottom: 3rem;
+        padding: 2rem;
+        background: var(--bg-card);
+        border: 1px solid rgba(168, 85, 247, 0.3);
+        border-radius: 20px;
+    }
+
+    .admin-header h1 {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 2.5rem;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+    }
+
+    .admin-badge {
+        display: inline-block;
+        padding: 0.5rem 1.5rem;
+        background: var(--gradient-primary);
+        color: white;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 2.5rem;
+        margin-bottom: 3rem;
+    }
+
+    .stat-card {
+        background: var(--bg-card);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(168, 85, 247, 0.3);
+        border-radius: 16px;
+        padding: 2rem;
+        transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px var(--glow-purple);
+    }
+
+    .stat-icon {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .stat-icon.users { color: var(--accent-purple); }
+    .stat-icon.analyses { color: var(--accent-cyan); }
+    .stat-icon.today { color: var(--accent-blue); }
+    .stat-icon.active { color: #22c55e; }
+
+    .stat-value {
+        font-size: 2.5rem;
+        font-weight: 800;
+        font-family: 'Orbitron', sans-serif;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+
+    .stat-change {
+        font-size: 0.85rem;
+        margin-top: 0.5rem;
+    }
+
+    .stat-change.positive {
+        color: #22c55e;
+    }
+
+    .stat-change.negative {
+        color: #ef4444;
+    }
+
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .dashboard-card {
+        background: var(--bg-card);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(168, 85, 247, 0.3);
+        border-radius: 20px;
+        padding: 2rem;
+    }
+
+    .dashboard-card.full-width {
+        grid-column: 1 / -1;
+    }
+
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid rgba(168, 85, 247, 0.2);
+    }
+
+    .card-title {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 1.3rem;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .card-action {
+        padding: 0.5rem 1rem;
+        background: var(--gradient-secondary);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .card-action:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px var(--glow-blue);
+    }
+
+    .user-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .user-table th {
+        background: rgba(168, 85, 247, 0.2);
+        color: var(--text-primary);
+        padding: 1rem;
+        text-align: left;
+        font-weight: 600;
+        border-bottom: 2px solid rgba(168, 85, 247, 0.3);
+    }
+
+    .user-table td {
+        padding: 1rem;
+        border-bottom: 1px solid rgba(168, 85, 247, 0.1);
+        color: var(--text-secondary);
+    }
+
+    .user-table tr:hover {
+        background: rgba(168, 85, 247, 0.05);
+    }
+
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid var(--accent-purple);
+    }
+
+    .user-avatar-placeholder {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: var(--gradient-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+    }
+
+    .status-badge {
+        padding: 0.3rem 0.8rem;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .status-badge.active {
+        background: rgba(34, 197, 94, 0.2);
+        color: #86efac;
+        border: 1px solid #22c55e;
+    }
+
+    .status-badge.inactive {
+        background: rgba(148, 163, 184, 0.2);
+        color: #cbd5e1;
+        border: 1px solid #94a3b8;
+    }
+
+    .activity-item {
+        display: flex;
+        gap: 1rem;
+        padding: 1rem;
+        border-bottom: 1px solid rgba(168, 85, 247, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .activity-item:hover {
+        background: rgba(168, 85, 247, 0.05);
+    }
+
+    .activity-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        flex-shrink: 0;
+    }
+
+    .activity-icon.user { background: rgba(168, 85, 247, 0.2); color: var(--accent-purple); }
+    .activity-icon.analysis { background: rgba(6, 182, 212, 0.2); color: var(--accent-cyan); }
+    .activity-icon.export { background: rgba(59, 130, 246, 0.2); color: var(--accent-blue); }
+
+    .activity-content {
+        flex: 1;
+    }
+
+    .activity-title {
+        color: var(--text-primary);
+        font-weight: 600;
+        margin-bottom: 0.3rem;
+    }
+
+    .activity-time {
+        color: var(--text-secondary);
+        font-size: 0.85rem;
+    }
+
+    .chart-container {
+        height: 300px;
+        margin-top: 1rem;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .btn-action {
+        padding: 0.4rem 0.8rem;
+        border: none;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .btn-view {
+        background: rgba(6, 182, 212, 0.2);
+        color: var(--accent-cyan);
+        border: 1px solid var(--accent-cyan);
+    }
+
+    .btn-view:hover {
+        background: rgba(6, 182, 212, 0.3);
+    }
+
+    .btn-delete {
+        background: rgba(239, 68, 68, 0.2);
+        color: #ef4444;
+        border: 1px solid #ef4444;
+    }
+
+    .btn-delete:hover {
+        background: rgba(239, 68, 68, 0.3);
+    }
+
+    .quick-actions {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .quick-action-btn {
+        padding: 1rem;
+        background: var(--bg-card);
+        border: 1px solid rgba(168, 85, 247, 0.3);
+        border-radius: 12px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: block;
+    }
+
+    .quick-action-btn:hover {
+        border-color: var(--accent-cyan);
+        transform: translateY(-3px);
+        box-shadow: 0 5px 20px var(--glow-cyan);
+    }
+
+    .quick-action-icon {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+        color: var(--accent-cyan);
+    }
+
+    .quick-action-label {
+        color: var(--text-primary);
+        font-weight: 600;
+    }
+
+    @media (max-width: 1024px) {
+        .dashboard-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 768px) {
+        main {
+            margin-top: 80px;
+            padding: 1rem;
+        }
+
+        .admin-header h1 {
+            font-size: 2rem;
+        }
+
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .user-table {
+            font-size: 0.85rem;
+        }
+
+        .user-table th,
+        .user-table td {
+            padding: 0.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-header">
+    <h1><i class="fas fa-shield-alt"></i> Admin Dashboard</h1>
+    <span class="admin-badge"><i class="fas fa-crown"></i> Administrator Access</span>
+    <p style="color: var(--text-secondary); margin-top: 1rem;">Welcome, {{ user.username }} | System Overview & Management</p>
+</div>
+
+<!-- Statistics Overview -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon users"><i class="fas fa-users"></i></div>
+        <div class="stat-value">{{ total_users }}</div>
+        <div class="stat-label">Total Users</div>
+        <div class="stat-change positive"><i class="fas fa-arrow-up"></i> {{ new_users_week }} this week</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon analyses"><i class="fas fa-microscope"></i></div>
+        <div class="stat-value">{{ total_analyses }}</div>
+        <div class="stat-label">Total Analyses</div>
+        <div class="stat-change positive"><i class="fas fa-arrow-up"></i> {{ analyses_today }} today</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon today"><i class="fas fa-calendar-day"></i></div>
+        <div class="stat-value">{{ analyses_today }}</div>
+        <div class="stat-label">Analyses Today</div>
+        <div class="stat-change">{{ avg_per_day }} avg/day</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon active"><i class="fas fa-user-check"></i></div>
+        <div class="stat-value">{{ active_users }}</div>
+        <div class="stat-label">Active Users</div>
+        <div class="stat-change">Last 7 days</div>
+    </div>
+</div>
+
+<!-- Main Dashboard Grid -->
+<div class="dashboard-grid">
+    <!-- Recent Users -->
+    <div class="dashboard-card">
+        <div class="card-header">
+            <h3 class="card-title"><i class="fas fa-users"></i> Recent Users</h3>
+            <a href="/admin/" class="card-action">Manage All</a>
+        </div>
+        
+        <table class="user-table">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Email</th>
+                    <th>Joined</th>
+                    <th>Analyses</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user_data in recent_users %}
+                <tr>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            {% if user_data.profile_picture %}
+                                <img src="{{ user_data.profile_picture }}" alt="{{ user_data.username }}" class="user-avatar">
+                            {% else %}
+                                <div class="user-avatar-placeholder">{{ user_data.username|first|upper }}</div>
+                            {% endif %}
+                            <span style="color: var(--text-primary); font-weight: 600;">{{ user_data.username }}</span>
+                        </div>
+                    </td>
+                    <td>{{ user_data.email }}</td>
+                    <td>{{ user_data.date_joined|date:"M d, Y" }}</td>
+                    <td>{{ user_data.prediction_count }}</td>
+                    <td>
+                        {% if user_data.is_active %}
+                            <span class="status-badge active">Active</span>
+                        {% else %}
+                            <span class="status-badge inactive">Inactive</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn-action btn-view" onclick="viewUser({{ user_data.id }})">
+                                <i class="fas fa-eye"></i> View
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="dashboard-card">
+        <div class="card-header">
+            <h3 class="card-title"><i class="fas fa-history"></i> Recent Activity</h3>
+        </div>
+        
+        <div>
+            {% for activity in recent_activity %}
+            <div class="activity-item">
+                <div class="activity-icon {{ activity.type }}">
+                    <i class="fas fa-{{ activity.icon }}"></i>
+                </div>
+                <div class="activity-content">
+                    <div class="activity-title">{{ activity.title }}</div>
+                    <div class="activity-time">{{ activity.time }}</div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- System Statistics Chart -->
+<div class="dashboard-card full-width">
+    <div class="card-header">
+        <h3 class="card-title"><i class="fas fa-chart-area"></i> System Usage (Last 30 Days)</h3>
+    </div>
+    <div class="chart-container">
+        <canvas id="systemUsageChart"></canvas>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="dashboard-card full-width">
+    <div class="card-header">
+        <h3 class="card-title"><i class="fas fa-bolt"></i> Quick Actions</h3>
+    </div>
+    
+    <div class="quick-actions">
+        <a href="/admin/" class="quick-action-btn">
+            <div class="quick-action-icon"><i class="fas fa-cog"></i></div>
+            <div class="quick-action-label">Django Admin</div>
+        </a>
+        
+        <a href="{% url 'analytics' %}" class="quick-action-btn">
+            <div class="quick-action-icon"><i class="fas fa-chart-line"></i></div>
+            <div class="quick-action-label">View Analytics</div>
+        </a>
+        
+        <a href="{% url 'history' %}" class="quick-action-btn">
+            <div class="quick-action-icon"><i class="fas fa-database"></i></div>
+            <div class="quick-action-label">All Analyses</div>
+        </a>
+        
+        <button class="quick-action-btn" onclick="exportSystemReport()">
+            <div class="quick-action-icon"><i class="fas fa-file-export"></i></div>
+            <div class="quick-action-label">Export Report</div>
+        </button>
+    </div>
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+<script>
+// System Usage Chart
+const usageData = {{ usage_data|safe }};
+
+if (document.getElementById('systemUsageChart')) {
+    const ctx = document.getElementById('systemUsageChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: usageData.labels,
+            datasets: [{
+                label: 'New Users',
+                data: usageData.users,
+                borderColor: 'rgba(168, 85, 247, 1)',
+                backgroundColor: 'rgba(168, 85, 247, 0.1)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4
+            }, {
+                label: 'Analyses',
+                data: usageData.analyses,
+                borderColor: 'rgba(6, 182, 212, 1)',
+                backgroundColor: 'rgba(6, 182, 212, 0.1)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: { color: '#94a3b8' }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { color: '#94a3b8', stepSize: 1 },
+                    grid: { color: 'rgba(168, 85, 247, 0.1)' }
+                },
+                x: {
+                    ticks: { color: '#94a3b8' },
+                    grid: { display: false }
+                }
+            }
+        }
+    });
+}
+
+function viewUser(userId) {
+    window.location.href = `/admin/auth/user/${userId}/change/`;
+}
+
+function exportSystemReport() {
+    alert('System report export feature coming soon!');
+}
+</script>
+{% endblock %}

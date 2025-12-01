@@ -1,0 +1,436 @@
+{% extends 'base_dark.html' %}
+
+{% block title %}Dashboard - SkinCare AI{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Hero Welcome Section */
+    .hero-welcome {
+        background: linear-gradient(135deg, rgba(168, 85, 247, 0.1) 0%, rgba(6, 182, 212, 0.1) 100%);
+        border: 1px solid rgba(168, 85, 247, 0.3);
+        border-radius: 24px;
+        padding: 4rem 2rem;
+        text-align: center;
+        margin-bottom: 3rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero-welcome::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(168, 85, 247, 0.1) 0%, transparent 70%);
+        animation: rotate 20s linear infinite;
+    }
+
+    @keyframes rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    .hero-welcome-content {
+        position: relative;
+        z-index: 1;
+    }
+
+    .welcome-title {
+        font-family: 'Orbitron', sans-serif;
+        font-size: clamp(2rem, 5vw, 3rem);
+        font-weight: 900;
+        background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-cyan) 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 1rem;
+    }
+
+    .welcome-subtitle {
+        font-size: 1.2rem;
+        color: var(--text-secondary);
+        margin-bottom: 2rem;
+    }
+
+    .hero-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 2rem;
+        margin-bottom: 3rem;
+    }
+
+    .stat-card {
+        background: var(--bg-card);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(168, 85, 247, 0.2);
+        border-radius: 16px;
+        padding: 2rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, var(--accent-purple), var(--accent-cyan));
+        transform: scaleX(0);
+        transition: transform 0.3s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--accent-cyan);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), 0 0 30px var(--glow-purple);
+    }
+
+    .stat-card:hover::before {
+        transform: scaleX(1);
+    }
+
+    .stat-number {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 3rem;
+        font-weight: 900;
+        background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-cyan) 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+        color: var(--text-secondary);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-size: 0.9rem;
+    }
+
+    /* Info Section */
+    .info-section {
+        margin-bottom: 3rem;
+    }
+
+    .section-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .section-header h2 {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 1.8rem;
+        background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-cyan) 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .section-header i {
+        font-size: 2rem;
+        color: var(--accent-purple);
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .info-box {
+        background: var(--bg-card);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(168, 85, 247, 0.2);
+        border-left: 4px solid var(--accent-cyan);
+        border-radius: 12px;
+        padding: 1.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .info-box:hover {
+        transform: translateX(10px);
+        border-left-color: var(--accent-purple);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .info-box h3 {
+        color: var(--text-primary);
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .info-box h3 i {
+        color: var(--accent-cyan);
+    }
+
+    .info-box p {
+        color: var(--text-secondary);
+        line-height: 1.6;
+    }
+
+    /* CTA Section */
+    .cta-section {
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(236, 72, 153, 0.1) 100%);
+        border: 1px solid rgba(59, 130, 246, 0.3);
+        border-radius: 24px;
+        padding: 3rem 2rem;
+        text-align: center;
+        margin-bottom: 3rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .cta-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, var(--accent-blue), var(--accent-pink));
+        animation: shimmer 3s ease-in-out infinite;
+    }
+
+    @keyframes shimmer {
+        0%, 100% { opacity: 0.5; }
+        50% { opacity: 1; }
+    }
+
+    .cta-title {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 2.5rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-pink) 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 1rem;
+    }
+
+    .cta-description {
+        font-size: 1.2rem;
+        color: var(--text-secondary);
+        margin-bottom: 2rem;
+    }
+
+    /* Disclaimer */
+    .disclaimer {
+        background: rgba(239, 68, 68, 0.1);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        border-left: 4px solid #ef4444;
+        border-radius: 12px;
+        padding: 2rem;
+    }
+
+    .disclaimer h2 {
+        color: #fca5a5;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .disclaimer p {
+        color: var(--text-secondary);
+        line-height: 1.8;
+    }
+
+    /* Conditions Grid */
+    .conditions-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-top: 2rem;
+    }
+
+    .condition-box {
+        background: var(--bg-card);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(168, 85, 247, 0.2);
+        border-radius: 12px;
+        padding: 1.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .condition-box:hover {
+        transform: translateY(-5px);
+        border-color: var(--accent-cyan);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .condition-box h3 {
+        color: var(--text-primary);
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .condition-box p {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Hero Welcome -->
+    <div class="hero-welcome fade-in">
+        <div class="hero-welcome-content">
+            <h1 class="welcome-title">WELCOME, {{ user.username|upper }}</h1>
+            <p class="welcome-subtitle">Advanced AI-Powered Skin Cancer Detection System</p>
+            <div class="hero-actions">
+                <a href="{% url 'analyze' %}" class="btn btn-primary">
+                    <i class="fas fa-microscope"></i> ANALYZE IMAGE
+                </a>
+                <a href="{% url 'history' %}" class="btn btn-secondary">
+                    <i class="fas fa-database"></i> VIEW HISTORY
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="stats-grid fade-in">
+        <div class="stat-card">
+            <div class="stat-number">{{ prediction_count }}</div>
+            <div class="stat-label">Your Analyses</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">92%</div>
+            <div class="stat-label">Model Accuracy</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">8</div>
+            <div class="stat-label">Classifications</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">&lt;2s</div>
+            <div class="stat-label">Analysis Time</div>
+        </div>
+    </div>
+
+    <!-- How It Works -->
+    <div class="info-section fade-in">
+        <div class="card">
+            <div class="section-header">
+                <i class="fas fa-cogs"></i>
+                <h2>HOW IT WORKS</h2>
+            </div>
+            <p style="color: var(--text-secondary); margin-bottom: 2rem;">
+                Our AI system uses state-of-the-art Convolutional Neural Networks to analyze skin lesions with precision.
+            </p>
+            <div class="info-grid">
+                <div class="info-box">
+                    <h3><i class="fas fa-upload"></i> 1. UPLOAD</h3>
+                    <p>Select a clear image of the skin lesion you want to analyze</p>
+                </div>
+                <div class="info-box">
+                    <h3><i class="fas fa-brain"></i> 2. AI ANALYSIS</h3>
+                    <p>Our CNN model processes the image using deep learning algorithms</p>
+                </div>
+                <div class="info-box">
+                    <h3><i class="fas fa-chart-bar"></i> 3. GET RESULTS</h3>
+                    <p>Receive detailed classification with confidence scores</p>
+                </div>
+                <div class="info-box">
+                    <h3><i class="fas fa-file-medical"></i> 4. MEDICAL INFO</h3>
+                    <p>Access comprehensive information and prevention guidelines</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detectable Conditions -->
+    <div class="info-section fade-in">
+        <div class="card">
+            <div class="section-header">
+                <i class="fas fa-stethoscope"></i>
+                <h2>DETECTABLE CONDITIONS</h2>
+            </div>
+            <p style="color: var(--text-secondary); margin-bottom: 2rem;">
+                Our system can identify the following skin conditions with high accuracy:
+            </p>
+            <div class="conditions-grid">
+                <div class="condition-box">
+                    <h3><i class="fas fa-circle" style="color: #ef4444;"></i> Melanoma</h3>
+                    <p>Serious skin cancer requiring immediate attention</p>
+                </div>
+                <div class="condition-box">
+                    <h3><i class="fas fa-circle" style="color: #f97316;"></i> Basal Cell Carcinoma</h3>
+                    <p>Most common type of skin cancer</p>
+                </div>
+                <div class="condition-box">
+                    <h3><i class="fas fa-circle" style="color: #eab308;"></i> Actinic Keratoses</h3>
+                    <p>Precancerous skin condition</p>
+                </div>
+                <div class="condition-box">
+                    <h3><i class="fas fa-circle" style="color: #22c55e;"></i> Benign Keratosis</h3>
+                    <p>Harmless skin growths</p>
+                </div>
+                <div class="condition-box">
+                    <h3><i class="fas fa-circle" style="color: #06b6d4;"></i> Dermatofibroma</h3>
+                    <p>Benign skin bump</p>
+                </div>
+                <div class="condition-box">
+                    <h3><i class="fas fa-circle" style="color: #3b82f6;"></i> Melanocytic Nevi</h3>
+                    <p>Common moles</p>
+                </div>
+                <div class="condition-box">
+                    <h3><i class="fas fa-circle" style="color: #8b5cf6;"></i> Vascular Lesions</h3>
+                    <p>Blood vessel abnormalities</p>
+                </div>
+                <div class="condition-box">
+                    <h3><i class="fas fa-circle" style="color: #10b981;"></i> Non-Cancerous</h3>
+                    <p>Other benign skin conditions</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CTA Section -->
+    <div class="cta-section fade-in">
+        <h2 class="cta-title">READY TO GET STARTED?</h2>
+        <p class="cta-description">Upload your first image and get instant AI-powered analysis</p>
+        <a href="{% url 'analyze' %}" class="btn btn-primary" style="font-size: 1.2rem; padding: 1.2rem 3rem;">
+            <i class="fas fa-microscope"></i> START ANALYSIS NOW
+        </a>
+    </div>
+
+    <!-- Disclaimer -->
+    <div class="disclaimer fade-in">
+        <h2><i class="fas fa-exclamation-triangle"></i> IMPORTANT DISCLAIMER</h2>
+        <p>
+            <strong>This system is for educational and screening purposes only.</strong> It is not a substitute for professional medical advice, diagnosis, or treatment. Always seek the advice of your physician or other qualified health provider with any questions you may have regarding a medical condition.
+        </p>
+        <p style="margin-top: 1rem;">
+            If you notice any suspicious skin lesions, changes in existing moles, or have concerns about your skin health, please consult a board-certified dermatologist immediately.
+        </p>
+    </div>
+</div>
+{% endblock %}

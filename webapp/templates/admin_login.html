@@ -1,0 +1,451 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Login - SkinCare AI{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+    }
+
+    main {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 1rem;
+        margin-top: 80px;
+        position: relative;
+    }
+
+    /* Animated background particles */
+    main::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background:
+            radial-gradient(circle at 20% 50%, rgba(239, 68, 68, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 80% 80%, rgba(220, 38, 38, 0.1) 0%, transparent 50%);
+        animation: float 20s ease-in-out infinite;
+        pointer-events: none;
+    }
+
+    @keyframes float {
+
+        0%,
+        100% {
+            transform: translateY(0px);
+        }
+
+        50% {
+            transform: translateY(-20px);
+        }
+    }
+
+    .login-container {
+        background: var(--bg-card);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(239, 68, 68, 0.2);
+        overflow: hidden;
+        max-width: 450px;
+        width: 100%;
+        animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        position: relative;
+        z-index: 1;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .login-container:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 25px 70px rgba(239, 68, 68, 0.3);
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px) scale(0.95);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    .login-header {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        padding: 3rem 2rem;
+        text-align: center;
+        color: white;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .login-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+        animation: rotate 20s linear infinite;
+    }
+
+    @keyframes rotate {
+        from {
+            transform: rotate(0deg);
+        }
+
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    .login-header i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        color: white;
+        position: relative;
+        z-index: 1;
+        animation: iconPulse 3s ease-in-out infinite;
+        display: inline-block;
+    }
+
+    @keyframes iconPulse {
+
+        0%,
+        100% {
+            transform: scale(1);
+            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.5));
+        }
+
+        50% {
+            transform: scale(1.1);
+            filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.8));
+        }
+    }
+
+    .login-header h2 {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 2.2rem;
+        font-weight: 800;
+        margin-bottom: 0.5rem;
+        color: white;
+        position: relative;
+        z-index: 1;
+    }
+
+    .login-header p {
+        opacity: 0.95;
+        font-size: 0.95rem;
+        color: white;
+        position: relative;
+        z-index: 1;
+    }
+
+    .admin-badge {
+        display: inline-block;
+        background: rgba(255, 255, 255, 0.2);
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        margin-top: 0.5rem;
+        font-weight: 600;
+        position: relative;
+        z-index: 1;
+        animation: badgePulse 2s ease-in-out infinite;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    @keyframes badgePulse {
+
+        0%,
+        100% {
+            box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4);
+        }
+
+        50% {
+            box-shadow: 0 0 0 8px rgba(255, 255, 255, 0);
+        }
+    }
+
+    .login-body {
+        padding: 2.5rem 2rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        font-size: 0.9rem;
+    }
+
+    .input-group {
+        position: relative;
+    }
+
+    .input-group i {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #ef4444;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.9rem 1rem 0.9rem 3rem;
+        background: rgba(26, 26, 36, 0.6);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        border-radius: 8px;
+        font-size: 1rem;
+        color: var(--text-primary);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        font-family: 'Inter', sans-serif;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #ef4444;
+        box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+        background: rgba(26, 26, 36, 0.8);
+        transform: translateY(-2px);
+    }
+
+    .input-group {
+        position: relative;
+        animation: slideIn 0.5s ease-out backwards;
+    }
+
+    .form-group:nth-child(1) .input-group {
+        animation-delay: 0.1s;
+    }
+
+    .form-group:nth-child(2) .input-group {
+        animation-delay: 0.2s;
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    .btn-login {
+        width: 100%;
+        padding: 1rem;
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        margin-top: 1rem;
+        position: relative;
+        overflow: hidden;
+        animation: slideIn 0.5s ease-out 0.3s backwards;
+    }
+
+    .btn-login::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.2);
+        transform: translate(-50%, -50%);
+        transition: width 0.6s, height 0.6s;
+    }
+
+    .btn-login:hover::before {
+        width: 300px;
+        height: 300px;
+    }
+
+    .btn-login:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 40px rgba(239, 68, 68, 0.5);
+    }
+
+    .btn-login:active {
+        transform: translateY(-1px);
+        box-shadow: 0 5px 20px rgba(239, 68, 68, 0.4);
+    }
+
+    .btn-login i {
+        position: relative;
+        z-index: 1;
+    }
+
+    .btn-login span {
+        position: relative;
+        z-index: 1;
+    }
+
+    .back-link {
+        text-align: center;
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid rgba(239, 68, 68, 0.2);
+    }
+
+    .back-link p {
+        color: var(--text-secondary);
+        margin-bottom: 0.5rem;
+    }
+
+    .back-link {
+        animation: slideIn 0.5s ease-out 0.4s backwards;
+    }
+
+    .back-link a {
+        color: #ef4444;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: inline-block;
+    }
+
+    .back-link a:hover {
+        color: #dc2626;
+        transform: translateX(-5px);
+    }
+
+    .back-link a i {
+        transition: transform 0.3s ease;
+    }
+
+    .back-link a:hover i {
+        transform: translateX(-3px);
+    }
+
+    .warning-notice {
+        background: rgba(239, 68, 68, 0.1);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        animation: slideIn 0.5s ease-out backwards;
+    }
+
+    .warning-notice i {
+        color: #ef4444;
+        font-size: 1.2rem;
+        animation: warningBlink 2s ease-in-out infinite;
+    }
+
+    @keyframes warningBlink {
+
+        0%,
+        100% {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: 0.5;
+        }
+    }
+
+    .warning-notice p {
+        color: var(--text-secondary);
+        font-size: 0.85rem;
+        margin: 0;
+    }
+
+    @media (max-width: 768px) {
+        .login-container {
+            margin: 1rem;
+        }
+
+        main {
+            margin-top: 70px;
+            padding: 1rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        main {
+            margin-top: 60px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="login-container">
+    <div class="login-header">
+        <i class="fas fa-shield-alt"></i>
+        <h2>Admin Access</h2>
+        <p>Secure administrator login</p>
+        <span class="admin-badge">
+            <i class="fas fa-lock"></i> RESTRICTED AREA
+        </span>
+    </div>
+
+    <div class="login-body">
+        <div class="warning-notice">
+            <i class="fas fa-exclamation-triangle"></i>
+            <p>This area is restricted to authorized administrators only. Unauthorized access attempts are logged.</p>
+        </div>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="username">Admin Username</label>
+                <div class="input-group">
+                    <i class="fas fa-user-shield"></i>
+                    <input type="text" id="username" name="username" class="form-control"
+                        placeholder="Enter admin username" required autocomplete="username">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Admin Password</label>
+                <div class="input-group">
+                    <i class="fas fa-key"></i>
+                    <input type="password" id="password" name="password" class="form-control"
+                        placeholder="Enter admin password" required autocomplete="current-password">
+                </div>
+            </div>
+
+            <button type="submit" class="btn-login">
+                <i class="fas fa-sign-in-alt"></i> <span>Admin Login</span>
+            </button>
+
+            <div class="back-link">
+                <p>Not an administrator?</p>
+                <a href="{% url 'login' %}">
+                    <i class="fas fa-arrow-left"></i> Back to User Login
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

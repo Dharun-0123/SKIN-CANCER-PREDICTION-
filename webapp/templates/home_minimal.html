@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - Minimal Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 50px;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .card {
+            background: white;
+            color: #333;
+            padding: 2rem;
+            border-radius: 16px;
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🩺 SkinCare AI - Home</h1>
+        <div class="card">
+            <h2>Welcome!</h2>
+            <p>This is a minimal test page.</p>
+            <p>User: {{ user }}</p>
+            <p>Authenticated: {{ user.is_authenticated }}</p>
+        </div>
+        <div class="card">
+            <h3>If you see this page with styling, Django templates work!</h3>
+        </div>
+    </div>
+</body>
+
+</html>

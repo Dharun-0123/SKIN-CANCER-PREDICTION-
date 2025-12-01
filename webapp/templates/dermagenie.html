@@ -1,0 +1,449 @@
+{% extends 'base.html' %}
+
+{% block title %}DermaGenie - AI Assistant{% endblock %}
+
+{% block extra_css %}
+<style>
+    main {
+        margin-top: 100px;
+        padding: 0;
+        height: calc(100vh - 100px);
+        display: flex;
+        flex-direction: column;
+        position: relative;
+    }
+
+    .chat-container {
+        max-width: 900px;
+        width: 100%;
+        margin: 0 auto;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .chat-messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 2rem 1rem 1rem 1rem;
+        scroll-behavior: smooth;
+    }
+
+    .chat-messages::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .chat-messages::-webkit-scrollbar-thumb {
+        background: rgba(168, 85, 247, 0.3);
+        border-radius: 3px;
+    }
+
+    .message {
+        margin-bottom: 2rem;
+        display: flex;
+        gap: 1rem;
+        animation: messageSlideIn 0.4s ease-out forwards !important;
+    }
+
+    @keyframes messageSlideIn {
+        0% {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        100% {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .message-user {
+        justify-content: flex-end;
+    }
+
+    .message-ai {
+        justify-content: flex-start;
+    }
+
+    .message-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #a855f7 0%, #06b6d4 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        flex-shrink: 0;
+    }
+
+    .message-content {
+        max-width: 75%;
+        padding: 0;
+        line-height: 1.7;
+    }
+
+    .message-user .message-content {
+        background: linear-gradient(135deg, #a855f7 0%, #06b6d4 100%);
+        color: white;
+        padding: 0.875rem 1.25rem;
+        border-radius: 18px;
+        border-bottom-right-radius: 4px;
+    }
+
+    .message-ai .message-content {
+        color: white;
+    }
+
+    /* ChatGPT-style formatting for AI messages */
+    /* CRITICAL: Force white on everything */
+    .message-ai .message-content,
+    .message-ai .message-content *,
+    .message-ai .message-content p,
+    .message-ai .message-content span,
+    .message-ai .message-content div {
+        color: white !important;
+    }
+
+    .message-ai .message-content p {
+        margin-bottom: 1rem;
+        line-height: 1.7;
+    }
+
+    .message-ai .message-content p:last-child {
+        margin-bottom: 0;
+    }
+
+    .message-ai .message-content h1,
+    .message-ai .message-content h2,
+    .message-ai .message-content h3 {
+        color: white !important;
+        font-weight: 600;
+        margin: 1.5rem 0 0.75rem 0;
+    }
+
+    .message-ai .message-content h1:first-child,
+    .message-ai .message-content h2:first-child,
+    .message-ai .message-content h3:first-child {
+        margin-top: 0;
+    }
+
+    .message-ai .message-content ul,
+    .message-ai .message-content ol {
+        color: white !important;
+        margin: 1rem 0;
+        padding-left: 1.5rem;
+    }
+
+    .message-ai .message-content li {
+        color: white !important;
+        margin-bottom: 0.5rem;
+    }
+
+    .message-ai .message-content strong {
+        color: white !important;
+        font-weight: 600;
+    }
+
+    .message-ai .message-content code {
+        color: white !important;
+        background: rgba(168, 85, 247, 0.2);
+        padding: 0.2rem 0.4rem;
+        border-radius: 4px;
+        font-family: 'Courier New', monospace;
+        font-size: 0.9em;
+    }
+
+    .message-ai .message-content pre {
+        background: rgba(0, 0, 0, 0.3);
+        padding: 1rem;
+        border-radius: 8px;
+        overflow-x: auto;
+        margin: 1rem 0;
+    }
+
+    .message-ai .message-content pre code {
+        background: none;
+        padding: 0;
+    }
+
+    /* Typing indicator */
+    .typing-indicator {
+        display: flex;
+        gap: 0.4rem;
+        padding: 1rem;
+    }
+
+    .typing-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.6);
+        animation: typingBounce 1.4s infinite ease-in-out;
+    }
+
+    .typing-dot:nth-child(1) {
+        animation-delay: -0.32s;
+    }
+
+    .typing-dot:nth-child(2) {
+        animation-delay: -0.16s;
+    }
+
+    @keyframes typingBounce {
+
+        0%,
+        80%,
+        100% {
+            transform: scale(0);
+            opacity: 0.5;
+        }
+
+        40% {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    /* Fixed input at bottom - ChatGPT style */
+    .chat-input-container {
+        position: sticky;
+        bottom: 0;
+        padding: 1rem;
+        background: linear-gradient(to top, var(--bg-primary) 80%, transparent);
+        backdrop-filter: blur(10px);
+    }
+
+    .chat-input-form {
+        display: flex;
+        gap: 0.75rem;
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    .chat-input {
+        flex: 1;
+        padding: 0.875rem 1rem;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(168, 85, 247, 0.3);
+        border-radius: 12px;
+        color: white;
+        font-size: 1rem;
+        transition: all 0.2s ease !important;
+    }
+
+    .chat-input::placeholder {
+        color: rgba(255, 255, 255, 0.5);
+    }
+
+    .chat-input:focus {
+        outline: none;
+        border-color: #a855f7;
+        background: rgba(255, 255, 255, 0.15);
+        box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.1);
+    }
+
+    .chat-send-btn {
+        padding: 0.875rem 1.5rem;
+        background: linear-gradient(135deg, #a855f7 0%, #06b6d4 100%);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease !important;
+    }
+
+    .chat-send-btn:hover:not(:disabled) {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(168, 85, 247, 0.4);
+    }
+
+    .chat-send-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: rgba(255, 255, 255, 0.6);
+    }
+
+    .empty-state h3 {
+        color: white;
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    /* Fade-in animation for text */
+    .fade-in-text {
+        animation: fadeIn 0.3s ease-out;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="chat-container">
+    <div class="chat-messages" id="chatMessages">
+        <div class="empty-state">
+            <h3>DermaGenie</h3>
+            <p>Ask me anything about skin care</p>
+        </div>
+    </div>
+
+    <div class="chat-input-container">
+        <form class="chat-input-form" id="chatForm">
+            {% csrf_token %}
+            <input type="text" class="chat-input" id="chatInput" placeholder="Type your message..." required>
+            <button type="submit" class="chat-send-btn">Send</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    const chatMessages = document.getElementById('chatMessages');
+    const chatForm = document.getElementById('chatForm');
+    const chatInput = document.getElementById('chatInput');
+    const sendBtn = document.querySelector('.chat-send-btn');
+    let isFirstMessage = true;
+    let typingIndicator = null;
+
+    function showTypingIndicator() {
+        if (isFirstMessage) {
+            chatMessages.innerHTML = '';
+            isFirstMessage = false;
+        }
+
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'message message-ai';
+
+        const avatar = document.createElement('div');
+        avatar.className = 'message-avatar';
+        avatar.innerHTML = '<i class="fas fa-robot"></i>';
+
+        const typingDiv = document.createElement('div');
+        typingDiv.className = 'typing-indicator';
+        typingDiv.innerHTML = `
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+    `;
+
+        messageDiv.appendChild(avatar);
+        messageDiv.appendChild(typingDiv);
+        chatMessages.appendChild(messageDiv);
+        typingIndicator = messageDiv;
+
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function hideTypingIndicator() {
+        if (typingIndicator) {
+            typingIndicator.remove();
+            typingIndicator = null;
+        }
+    }
+
+    function addMessage(content, isUser = false) {
+        if (isFirstMessage) {
+            chatMessages.innerHTML = '';
+            isFirstMessage = false;
+        }
+
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${isUser ? 'message-user' : 'message-ai'}`;
+
+        const avatar = document.createElement('div');
+        avatar.className = 'message-avatar';
+        avatar.innerHTML = isUser ? '<i class="fas fa-user"></i>' : '<i class="fas fa-robot"></i>';
+
+        const contentDiv = document.createElement('div');
+        contentDiv.className = 'message-content fade-in-text';
+
+        if (isUser) {
+            contentDiv.textContent = content;
+        } else {
+            // Use formatted HTML for AI responses
+            contentDiv.innerHTML = content;
+
+            // Simple color fix - don't interfere with animations
+            setTimeout(() => {
+                const allElements = contentDiv.querySelectorAll('*');
+                allElements.forEach(el => {
+                    el.style.color = 'white';
+                });
+            }, 450); // After animation completes
+        }
+
+        messageDiv.appendChild(avatar);
+        messageDiv.appendChild(contentDiv);
+        chatMessages.appendChild(messageDiv);
+
+        // Smooth scroll
+        setTimeout(() => {
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }, 100);
+    }
+
+    chatForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const message = chatInput.value.trim();
+        if (!message) return;
+
+        // Add user message
+        addMessage(message, true);
+
+        // Clear and disable input
+        chatInput.value = '';
+        chatInput.disabled = true;
+        sendBtn.disabled = true;
+
+        // Show typing indicator
+        showTypingIndicator();
+
+        try {
+            const response = await fetch('{% url "dermagenie_chat" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({ message: message })
+            });
+
+            const data = await response.json();
+
+            // Hide typing indicator
+            hideTypingIndicator();
+
+            if (data.success) {
+                // Use formatted HTML for beautiful output
+                addMessage(data.formatted_html, false);
+            } else {
+                addMessage('<p>Error: ' + data.message + '</p>', false);
+            }
+        } catch (error) {
+            hideTypingIndicator();
+            addMessage('<p>Error: Failed to connect to DermaGenie</p>', false);
+        } finally {
+            chatInput.disabled = false;
+            sendBtn.disabled = false;
+            chatInput.focus();
+        }
+    });
+
+    chatInput.focus();
+</script>
+{% endblock %}

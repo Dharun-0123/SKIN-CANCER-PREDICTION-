@@ -1,0 +1,310 @@
+{% extends 'base.html' %}
+
+{% block title %}Login - SkinCare AI{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+    }
+
+    main {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 1rem;
+        margin-top: 80px; /* Add space for fixed navbar */
+    }
+
+    .login-container {
+        background: var(--bg-card);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(168, 85, 247, 0.3);
+        border-radius: 20px;
+        box-shadow: var(--shadow-elevated);
+        overflow: hidden;
+        max-width: 450px;
+        width: 100%;
+        animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .login-container:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 25px 70px rgba(168, 85, 247, 0.3);
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px) scale(0.95);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    .login-header {
+        background: var(--gradient-primary);
+        padding: 3rem 2rem;
+        text-align: center;
+        color: white;
+    }
+
+    .login-header i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        color: white;
+        animation: iconFloat 3s ease-in-out infinite;
+        display: inline-block;
+    }
+
+    @keyframes iconFloat {
+        0%, 100% { 
+            transform: translateY(0px);
+        }
+        50% { 
+            transform: translateY(-10px);
+        }
+    }
+
+    .login-header h2 {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 2.2rem;
+        font-weight: 800;
+        margin-bottom: 0.5rem;
+        color: white;
+    }
+
+    .login-header p {
+        opacity: 0.95;
+        font-size: 0.95rem;
+        color: white;
+    }
+
+    .login-body {
+        padding: 2.5rem 2rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        font-size: 0.9rem;
+    }
+
+    .input-group {
+        position: relative;
+    }
+
+    .input-group i {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-secondary);
+    }
+
+    .form-group {
+        animation: slideIn 0.5s ease-out backwards;
+    }
+
+    .form-group:nth-child(1) {
+        animation-delay: 0.1s;
+    }
+
+    .form-group:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.9rem 1rem 0.9rem 3rem;
+        background: rgba(26, 26, 36, 0.6);
+        border: 1px solid rgba(168, 85, 247, 0.3);
+        border-radius: 8px;
+        font-size: 1rem;
+        color: var(--text-primary);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        font-family: 'Inter', sans-serif;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: var(--accent-cyan);
+        box-shadow: 0 0 20px var(--glow-cyan);
+        background: rgba(26, 26, 36, 0.8);
+        transform: translateY(-2px);
+    }
+
+    .btn-login {
+        width: 100%;
+        padding: 1rem;
+        background: var(--gradient-primary);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        margin-top: 1rem;
+        position: relative;
+        overflow: hidden;
+        animation: slideIn 0.5s ease-out 0.3s backwards;
+    }
+
+    .btn-login::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.2);
+        transform: translate(-50%, -50%);
+        transition: width 0.6s, height 0.6s;
+    }
+
+    .btn-login:hover::before {
+        width: 300px;
+        height: 300px;
+    }
+
+    .btn-login:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 40px var(--glow-purple);
+    }
+
+    .btn-login:active {
+        transform: translateY(-1px);
+    }
+
+    .register-link {
+        text-align: center;
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid rgba(168, 85, 247, 0.2);
+    }
+
+    .register-link p {
+        color: var(--text-secondary);
+        margin-bottom: 0.5rem;
+    }
+
+    .register-link {
+        animation: slideIn 0.5s ease-out 0.4s backwards;
+    }
+
+    .register-link a {
+        color: var(--accent-cyan);
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: inline-block;
+    }
+
+    .register-link a:hover {
+        color: var(--accent-purple);
+        transform: translateX(5px);
+    }
+
+    .register-link a i {
+        transition: transform 0.3s ease;
+    }
+
+    .register-link a:hover i {
+        transform: scale(1.2);
+    }
+
+    @media (max-width: 768px) {
+        .login-container {
+            margin: 1rem;
+        }
+        
+        main {
+            margin-top: 70px;
+            padding: 1rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        main {
+            margin-top: 60px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="login-container">
+    <div class="login-header">
+        <i class="fas fa-user-circle"></i>
+        <h2>Welcome Back</h2>
+        <p>Login to access your account</p>
+    </div>
+
+    <div class="login-body">
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="username">Username</label>
+                <div class="input-group">
+                    <i class="fas fa-user"></i>
+                    <input type="text" id="username" name="username" class="form-control"
+                        placeholder="Enter your username" required autocomplete="username">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <div class="input-group">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="password" name="password" class="form-control"
+                        placeholder="Enter your password" required autocomplete="current-password">
+                </div>
+            </div>
+
+            <button type="submit" class="btn-login">
+                <i class="fas fa-sign-in-alt"></i> Login
+            </button>
+
+            <div class="register-link">
+                <p>Don't have an account?</p>
+                <a href="{% url 'register' %}">
+                    <i class="fas fa-user-plus"></i> Create Account
+                </a>
+            </div>
+
+            <div class="register-link" style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(168, 85, 247, 0.2);">
+                <p>Are you an administrator?</p>
+                <a href="{% url 'admin_login' %}">
+                    <i class="fas fa-shield-alt"></i> Admin Login
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

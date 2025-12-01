@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}Test Home{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 2rem;">
+    <h1 style="color: #007B8E;">✅ Home Page is Working!</h1>
+    <p>If you can see this, the template system is working correctly.</p>
+    
+    <div style="background: white; padding: 2rem; border-radius: 16px; margin-top: 2rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        <h2>User Information</h2>
+        <p><strong>Username:</strong> {{ user.username }}</p>
+        <p><strong>Email:</strong> {{ user.email }}</p>
+        <p><strong>Authenticated:</strong> {{ user.is_authenticated }}</p>
+        <p><strong>Prediction Count:</strong> {{ prediction_count|default:"0" }}</p>
+    </div>
+    
+    <div style="margin-top: 2rem;">
+        <a href="{% url 'analyze' %}" style="background: linear-gradient(135deg, #007B8E 0%, #3BCBB0 100%); color: white; padding: 1rem 2rem; border-radius: 8px; text-decoration: none; display: inline-block;">
+            Go to Analyze Page
+        </a>
+    </div>
+</div>
+{% endblock %}

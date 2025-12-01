@@ -1,0 +1,358 @@
+{% extends 'base.html' %}
+
+
+
+{% block title %}Prediction History - SkinCare AI{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Override for dark theme history */
+    .history-card {
+        background: var(--bg-card);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(168, 85, 247, 0.2);
+    }
+    
+    .history-card:hover {
+        border-color: var(--accent-cyan);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), 0 0 30px var(--glow-purple);
+    }
+    
+    .stat-box {
+        background: var(--bg-card);
+        border: 1px solid rgba(168, 85, 247, 0.2);
+    }
+    
+    .empty-state {
+        background: var(--bg-card);
+        border: 1px solid rgba(168, 85, 247, 0.2);
+    }
+    
+    .history-label {
+        color: var(--text-primary);
+    }
+    
+    .history-date {
+        color: var(--text-secondary);
+    }
+
+.history-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+
+    .history-header h1 {
+        font-size: 3rem;
+        font-weight: 800;
+        background: var(--gradient-primary);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 0.5rem;
+        letter-spacing: -0.02em;
+    }
+
+    .history-header p {
+        color: var(--text-secondary);
+        font-size: 1.1rem;
+        line-height: 1.7;
+    }
+
+    .history-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 2.5rem;
+        margin-bottom: 3rem;
+    }
+    
+    @media (max-width: 768px) {
+        .history-grid {
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .history-grid {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+    }
+
+    .history-card {
+        background: var(--bg-card);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(168, 85, 247, 0.2);
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+        transition: all 0.3s ease;
+    }
+
+    .history-card:hover {
+        border-color: var(--accent-cyan);
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .history-image {
+        width: 100%;
+        height: 250px;
+        object-fit: cover;
+        border-bottom: 3px solid var(--color-primary-end);
+    }
+
+    .history-content {
+        padding: 1.5rem;
+    }
+
+    .history-label {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        letter-spacing: -0.01em;
+    }
+
+    .history-date {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        line-height: 1.7;
+    }
+
+    .badge {
+        display: inline-block;
+        padding: 0.4rem 1rem;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin-top: 0.5rem;
+    }
+
+    .badge-success {
+        background: rgba(34, 197, 94, 0.2);
+        color: #86efac;
+        border: 1px solid #22c55e;
+    }
+
+    .badge-warning {
+        background: rgba(251, 191, 36, 0.2);
+        color: #fcd34d;
+        border: 1px solid #fbbf24;
+    }
+
+    .badge-danger {
+        background: rgba(239, 68, 68, 0.2);
+        color: #fca5a5;
+        border: 1px solid #ef4444;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: var(--bg-card);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(168, 85, 247, 0.2);
+        border-radius: 20px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    .empty-state i {
+        font-size: 5rem;
+        color: var(--accent-purple);
+        margin-bottom: 1.5rem;
+        opacity: 0.5;
+    }
+
+    .empty-state h3 {
+        font-size: 1.8rem;
+        color: var(--text-primary);
+        margin-bottom: 1rem;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+    }
+
+    .empty-state p {
+        color: var(--text-secondary);
+        margin-bottom: 2rem;
+        line-height: 1.7;
+    }
+
+    .stats-bar {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 2rem;
+        margin-bottom: 3rem;
+    }
+    
+    @media (max-width: 768px) {
+        .stats-bar {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .stats-bar {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+        
+        .stat-box {
+            padding: 1rem;
+        }
+        
+        .stat-number {
+            font-size: 1.5rem;
+        }
+    }
+
+    .stat-box {
+        background: var(--bg-card);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(168, 85, 247, 0.2);
+        padding: 1.5rem;
+        border-radius: 12px;
+        text-align: center;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    }
+
+    .stat-box i {
+        font-size: 2rem;
+        color: var(--accent-cyan);
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-number {
+        font-size: 2rem;
+        font-weight: 800;
+        color: var(--text-primary);
+        letter-spacing: -0.02em;
+    }
+
+    .stat-label {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        margin-top: 0.3rem;
+        line-height: 1.7;
+    }
+
+    .history-header h1 {
+        font-size: 3rem;
+    }
+    
+    @media (max-width: 768px) {
+        .history-header h1 {
+            font-size: 2rem;
+        }
+        
+        .history-header p {
+            font-size: 1rem;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .history-header h1 {
+            font-size: 1.5rem;
+        }
+        
+        .history-header p {
+            font-size: 0.9rem;
+        }
+    }
+</style>
+{% endblock %}
+
+
+
+{% block content %}
+<div class="container">
+    <div class="history-header">
+        <h1><i class="fas fa-history"></i> Your Prediction History</h1>
+        <p>View all your previous skin lesion analyses - {{ user.username }}</p>
+    </div>
+
+    {% if models %}
+    <div class="stats-bar">
+        <div class="stat-box">
+            <i class="fas fa-user"></i>
+            <div class="stat-number">{{ user.username }}</div>
+            <div class="stat-label">Your Account</div>
+        </div>
+        <div class="stat-box">
+            <i class="fas fa-images"></i>
+            <div class="stat-number">{{ models|length }}</div>
+            <div class="stat-label">Your Analyses</div>
+        </div>
+        <div class="stat-box">
+            <i class="fas fa-brain"></i>
+            <div class="stat-number">92%</div>
+            <div class="stat-label">Model Accuracy</div>
+        </div>
+        <div class="stat-box">
+            <i class="fas fa-clock"></i>
+            <div class="stat-number">&lt;2s</div>
+            <div class="stat-label">Avg. Analysis Time</div>
+        </div>
+    </div>
+
+    <div class="history-grid">
+        {% for model in models %}
+        <div class="history-card">
+            <img src="{{ model.image.url }}" alt="Skin Lesion" class="history-image">
+            <div class="history-content">
+                <div class="history-label">
+                    <i class="fas fa-microscope"></i>
+                    {{ model.label|default:"Pending Analysis" }}
+                </div>
+                <div class="history-date">
+                    <i class="fas fa-calendar"></i>
+                    Analysis #{{ forloop.counter }}
+                </div>
+                {% if "cancer" in model.label|lower or "melanoma" in model.label|lower %}
+                    <span class="badge badge-danger"><i class="fas fa-exclamation-triangle"></i> Requires Attention</span>
+                {% elif "benign" in model.label|lower or "not" in model.label|lower %}
+                    <span class="badge badge-success"><i class="fas fa-check-circle"></i> Benign</span>
+                {% else %}
+                    <span class="badge badge-warning"><i class="fas fa-info-circle"></i> Review Needed</span>
+                {% endif %}
+                <div style="margin-top: 1rem;">
+                    <a href="{% url 'export_single_pdf' model.id %}" class="btn btn-outline" style="width: 100%; padding: 0.6rem; font-size: 0.9rem; text-decoration: none; display: inline-block;">
+                        <i class="fas fa-file-pdf"></i> Export PDF
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div style="text-align: center; margin-top: 2rem; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+        <a href="{% url 'analyze' %}" class="btn btn-primary">
+            <i class="fas fa-plus-circle"></i> New Analysis
+        </a>
+        <a href="{% url 'compare' %}" class="btn btn-secondary">
+            <i class="fas fa-balance-scale"></i> Compare Analyses
+        </a>
+        <a href="{% url 'home' %}" class="btn btn-outline">
+            <i class="fas fa-home"></i> Back to Home
+        </a>
+    </div>
+
+    {% else %}
+    <div class="empty-state">
+        <i class="fas fa-folder-open"></i>
+        <h3>No Analyses Yet, {{ user.username }}!</h3>
+        <p>You haven't analyzed any skin lesions yet. Start by uploading your first image to get AI-powered classification results.</p>
+        <a href="{% url 'analyze' %}" class="btn btn-primary">
+            <i class="fas fa-upload"></i> Upload First Image
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
