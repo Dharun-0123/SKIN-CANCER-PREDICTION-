@@ -44,7 +44,7 @@ def send_welcome_email(user):
         send_mail(
             subject,
             plain_message,
-            settings.DEFAULT_FROM_EMAIL if hasattr(settings, 'DEFAULT_FROM_EMAIL') else 'noreply@skincareai.com',
+            settings.DEFAULT_FROM_EMAIL,
             [user.email],
             html_message=html_message,
             fail_silently=False,
@@ -89,7 +89,7 @@ def send_prediction_notification(user, prediction_result, image_url):
         send_mail(
             subject,
             plain_message,
-            settings.DEFAULT_FROM_EMAIL if hasattr(settings, 'DEFAULT_FROM_EMAIL') else 'noreply@skincareai.com',
+            settings.DEFAULT_FROM_EMAIL,
             [user.email],
             html_message=html_message,
             fail_silently=False,
@@ -130,7 +130,7 @@ def send_profile_update_notification(user):
         send_mail(
             subject,
             plain_message,
-            settings.DEFAULT_FROM_EMAIL if hasattr(settings, 'DEFAULT_FROM_EMAIL') else 'noreply@skincareai.com',
+            settings.DEFAULT_FROM_EMAIL,
             [user.email],
             html_message=html_message,
             fail_silently=False,

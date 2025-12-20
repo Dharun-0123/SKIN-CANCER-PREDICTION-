@@ -133,16 +133,20 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Email Configuration - Resend SMTP
+# Email Configuration - Resend SMTP with Verified Domain
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.resend.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'resend'  # Always 'resend' for Resend SMTP
 EMAIL_HOST_PASSWORD = os.environ.get('RESEND_API_KEY', '')
-DEFAULT_FROM_EMAIL = 'SkinCare AI <onboarding@resend.dev>'
-# Note: With free Resend account, you can only send to your verified email: givemeanythingu@gmail.com
-# To send to any email, verify a domain at resend.com/domains
+DEFAULT_FROM_EMAIL = 'SkinCare AI <noreply@dharundev.me>'  # Using verified domain
+SERVER_EMAIL = 'SkinCare AI <noreply@dharundev.me>'
+EMAIL_TIMEOUT = 30
+
+# Email settings for verified domain
+RESEND_FROM_EMAIL = 'noreply@dharundev.me'
+RESEND_DOMAIN = 'dharundev.me'
 
 # OTP Configuration
 OTP_EXPIRY_MINUTES = 10  # OTP expires after 10 minutes

@@ -4,6 +4,7 @@ from . import views
 urlpatterns =[
     # Public pages
     path('', views.Landing_1, name='landing'),
+    path('terms/', views.TermsAndConditions, name='terms'),
     path('test/', views.test_view, name='test'),
     path('simple/', views.simple_test, name='simple'),
     path('minimal/', views.home_minimal, name='minimal'),
@@ -14,6 +15,12 @@ urlpatterns =[
     path('admin-login/', views.Admin_Login, name='admin_login'),
     path('logout/', views.Logout, name='logout'),
     
+    # Password reset URLs
+    path('forgot-password/', views.forgot_password, name='forgot_password'),
+    path('verify-reset-otp/', views.verify_reset_otp, name='verify_reset_otp'),
+    path('reset-password/', views.reset_password, name='reset_password'),
+    path('resend-reset-otp/', views.resend_reset_otp, name='resend_reset_otp'),
+    
     # Protected pages (require login)
     path('home/', views.Home_4, name='home'),
     path('profile/', views.Profile, name='profile'),
@@ -22,6 +29,7 @@ urlpatterns =[
     path('dermagenie/', views.DermaGenie, name='dermagenie'),
     path('admin-dashboard/', views.AdminDashboard, name='admin_dashboard'),
     path('analyze/', views.Deploy_8, name='analyze'),
+    path('analysis-results/', views.analysis_results, name='analysis_results'),
     path('history/', views.Out_Database_9, name='history'),
     path('about/', views.Teamates_5, name='about'),
     path('results/', views.Domain_Result_6, name='results'),
@@ -32,6 +40,7 @@ urlpatterns =[
     path('export/pdf/', views.ExportPDF, name='export_pdf'),
     path('export/pdf/<int:prediction_id>/', views.ExportSinglePDF, name='export_single_pdf'),
     path('dermagenie/chat/', views.DermaGenieChat, name='dermagenie_chat'),
+    path('dermagenie-chat/', views.DermaGenieWidgetChat, name='dermagenie_widget_chat'),
     
     # Patient analysis
     path('patient/', views.input, name='patient'),

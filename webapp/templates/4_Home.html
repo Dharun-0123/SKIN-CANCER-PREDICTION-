@@ -78,11 +78,11 @@
         style="background: linear-gradient(135deg, rgba(168, 85, 247, 0.2) 0%, rgba(6, 182, 212, 0.2) 100%); border: 2px solid var(--accent-purple); border-radius: 20px; margin-bottom: 3rem; text-align: center; box-shadow: 0 0 40px rgba(168, 85, 247, 0.3);">
         <h1 style="font-size: 3rem; font-weight: 800; margin-bottom: 1rem; color: var(--text-primary); text-shadow: 0 0 30px rgba(168, 85, 247, 0.5);">Welcome, {{ user.username }}!</h1>
         <p style="font-size: 1.2rem; margin-bottom: 2rem; color: var(--text-secondary);">Advanced AI-Powered Skin Cancer Detection</p>
-        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;" class="mobile-flex mobile-text-center">
             <a href="{% url 'analyze' %}" class="btn btn-primary">
                 <i class="fas fa-upload"></i> Analyze Image
             </a>
-            <a href="{% url 'history' %}" class="btn btn-secondary">
+            <a href="{% url 'history' %}" class="btn btn-secondary btn-inline">
                 <i class="fas fa-history"></i> View History
             </a>
         </div>
@@ -93,25 +93,25 @@
             <div
                 style="font-size: 3rem; font-weight: 800; background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-cyan) 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">
                 {{ prediction_count }}</div>
-            <div style="color: var(--text-secondary); font-weight: 600; margin-top: 0.5rem;">Your Analyses</div>
+            <div style="color: var(--text-secondary); font-weight: 600; margin-top: 0.5rem;" data-tooltip="your-analyses">Your Analyses</div>
         </div>
         <div class="card" style="text-align: center;">
             <div
                 style="font-size: 3rem; font-weight: 800; background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-cyan) 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">
                 92%</div>
-            <div style="color: var(--text-secondary); font-weight: 600; margin-top: 0.5rem;">Model Accuracy</div>
+            <div style="color: var(--text-secondary); font-weight: 600; margin-top: 0.5rem;" data-tooltip="model-accuracy">Model Accuracy</div>
         </div>
         <div class="card" style="text-align: center;">
             <div
                 style="font-size: 3rem; font-weight: 800; background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-cyan) 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">
                 8</div>
-            <div style="color: var(--text-secondary); font-weight: 600; margin-top: 0.5rem;">Classifications</div>
+            <div style="color: var(--text-secondary); font-weight: 600; margin-top: 0.5rem;" data-tooltip="classifications">Classifications</div>
         </div>
         <div class="card" style="text-align: center;">
             <div
                 style="font-size: 3rem; font-weight: 800; background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-cyan) 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">
                 &lt;2s</div>
-            <div style="color: var(--text-secondary); font-weight: 600; margin-top: 0.5rem;">Analysis Time</div>
+            <div style="color: var(--text-secondary); font-weight: 600; margin-top: 0.5rem;" data-tooltip="analysis-time">Analysis Time</div>
         </div>
     </div>
 
@@ -153,9 +153,15 @@
     </div>
 
     <div class="card" style="border-left: 4px solid var(--accent-pink);">
-        <h2 style="color: var(--text-primary);"><i class="fas fa-exclamation-triangle" style="color: var(--accent-pink);"></i> Important Disclaimer</h2>
-        <p style="color: var(--text-secondary);"><strong style="color: var(--text-primary);">This system is for educational purposes only.</strong> It is not a substitute for professional
-            medical advice. Always consult a qualified healthcare provider for medical concerns.</p>
+        <h2 style="color: var(--text-primary);" data-tooltip="medical-disclaimer"><i class="fas fa-exclamation-triangle" style="color: var(--accent-pink);"></i> Important Medical Disclaimer</h2>
+        <p style="color: var(--text-secondary); margin-bottom: 1rem;"><strong style="color: var(--text-primary);">This system is for educational purposes only.</strong> It is NOT a medical diagnostic device and should not replace professional medical advice.</p>
+        <p style="color: var(--text-secondary); margin-bottom: 1rem;"><strong style="color: var(--text-primary);">⚠️ Image Limitations:</strong> Results may vary as photos are captured with standard cameras, not medical-grade dermoscopy equipment. Lighting, focus, and image quality significantly affect accuracy.</p>
+        <p style="color: var(--text-secondary);" data-tooltip="consult-doctor"><strong style="color: var(--text-primary);">🏥 Always Consult a Healthcare Professional:</strong> If you have any concerns about your skin health, please consult a qualified dermatologist or healthcare provider for proper diagnosis and treatment.</p>
+        <div style="margin-top: 1rem; text-align: center;">
+            <button onclick="showDisclaimerAgain()" class="btn btn-outline" style="font-size: 0.9rem; padding: 0.6rem 1.2rem;">
+                <i class="fas fa-info-circle"></i> View Full Disclaimer
+            </button>
+        </div>
     </div>
 </div>
 

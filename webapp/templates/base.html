@@ -15,6 +15,15 @@
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
         media="print" onload="this.media='all'">
+    
+    <!-- Tooltip System CSS -->
+    <link rel="stylesheet" href="{% static 'css/tooltips.css' %}">
+    
+    <!-- DermaGenie Widget CSS -->
+    <link rel="stylesheet" href="{% static 'css/dermagenie-widget.css">
+    
+    <!-- Mobile Navigation CSS -->
+    <link rel="stylesheet" href="{% static 'css/mobile-navigation.css' %}' %}">
 
     <style>
         /* ========================================
@@ -70,6 +79,7 @@
             line-height: 1.6;
             overflow-x: hidden;
             position: relative;
+            padding-top: 5rem; /* Global padding for fixed navbar */
         }
 
         /* Animated Background - DISABLED FOR PERFORMANCE */
@@ -687,6 +697,11 @@
                 <i class="fas fa-brain"></i>
                 <span>SKINCARE AI</span>
             </a>
+            
+            <!-- Mobile Navigation Toggle -->
+            <button class="mobile-nav-toggle" id="mobileNavToggle">
+                <i class="fas fa-bars"></i>
+            </button>
             <ul class="nav-links">
                 {% if user.is_authenticated %}
                 {% if user.is_staff or user.is_superuser %}
@@ -747,6 +762,32 @@
             </ul>
         </div>
     </nav>
+    <!-- Mobile Navigation Menu -->
+    <div class="mobile-nav-menu" id="mobileNavMenu">
+        <ul class="nav-links">
+            {% if user.is_authenticated %}
+            {% if user.is_staff or user.is_superuser %}
+            <!-- Admin Mobile Navigation -->
+            <li><a href="{% url 'admin_dashboard' %}" style="color: #fbbf24;"><i class="fas fa-shield-alt"></i> Admin Dashboard</a></li>
+            <li><a href="{% url 'logout' %}" style="color: #ef4444;"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            {% else %}
+            <!-- Regular User Mobile Navigation -->
+            <li><a href="{% url 'home' %}"><i class="fas fa-home"></i> Dashboard</a></li>
+            <li><a href="{% url 'analyze' %}"><i class="fas fa-microscope"></i> Analyze</a></li>
+            <li><a href="{% url 'history' %}"><i class="fas fa-database"></i> History</a></li>
+            <li><a href="{% url 'dermagenie' %}"><i class="fas fa-magic"></i> DermaGenie AI</a></li>
+            <li><a href="{% url 'analytics' %}"><i class="fas fa-chart-line"></i> Analytics</a></li>
+            <li><a href="{% url 'compare' %}"><i class="fas fa-balance-scale"></i> Compare</a></li>
+            <li><a href="{% url 'about' %}"><i class="fas fa-users"></i> About</a></li>
+            <li><a href="{% url 'profile' %}"><i class="fas fa-user-edit"></i> Profile</a></li>
+            <li><a href="{% url 'logout' %}" style="color: #ef4444;"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            {% endif %}
+            {% else %}
+            <li><a href="{% url 'login' %}" class="btn btn-outline btn-inline">Login</a></li>
+            <li><a href="{% url 'register' %}" class="btn btn-primary btn-inline">Register</a></li>
+            {% endif %}
+        </ul>
+    </div>
 
     <!-- Messages -->
     <div class="messages">
@@ -757,6 +798,146 @@
             <span>{{ message }}</span>
         </div>
         {% endfor %}
+    </div>
+
+    <!-- Terms & Conditions Modal (Shows First) -->
+    <div class="terms-modal" id="termsModal">
+        <div class="terms-content">
+            <div class="terms-header">
+                <i class="fas fa-file-contract"></i>
+                <h2>Welcome to SkinCare AI</h2>
+                <p>Please review our Terms & Conditions</p>
+            </div>
+            
+            <div class="terms-body">
+                <h3><i class="fas fa-handshake"></i> Terms of Service</h3>
+                <p>By using SkinCare AI, you agree to the following terms:</p>
+                
+                <div class="terms-section">
+                    <h4>1. Educational Purpose</h4>
+                    <p>This application is designed for <strong>educational and informational purposes only</strong>. It provides AI-powered analysis to help raise awareness about skin health.</p>
+                </div>
+                
+                <div class="terms-section">
+                    <h4>2. Not Medical Advice</h4>
+                    <p>SkinCare AI does not provide medical diagnoses, treatment recommendations, or professional medical advice. Results are AI predictions based on image analysis.</p>
+                </div>
+                
+                <div class="terms-section">
+                    <h4>3. Image Quality & Limitations</h4>
+                    <p>Our AI analyzes photos taken with standard cameras. Results may vary based on image quality, lighting, and other factors. Professional medical imaging equipment provides more accurate results.</p>
+                </div>
+                
+                <div class="terms-section">
+                    <h4>4. Professional Consultation Required</h4>
+                    <p>Always consult a qualified dermatologist or healthcare provider for proper medical evaluation, diagnosis, and treatment of any skin concerns.</p>
+                </div>
+                
+                <div class="terms-section">
+                    <h4>5. Data Privacy</h4>
+                    <p>Your uploaded images and analysis results are stored securely and used only for providing our service. We do not share your personal health information with third parties.</p>
+                </div>
+                
+                <div class="terms-section">
+                    <h4>6. Accuracy & Liability</h4>
+                    <p>While our AI models are trained on extensive medical datasets, we cannot guarantee 100% accuracy. We are not liable for any decisions made based on our AI predictions.</p>
+                </div>
+                
+                <div class="terms-section">
+                    <h4>7. Age Requirement</h4>
+                    <p>You must be at least 18 years old or have parental consent to use this service.</p>
+                </div>
+                
+                <div class="terms-highlight">
+                    <p><i class="fas fa-info-circle"></i> <strong>Important:</strong> If you notice any concerning skin changes, seek immediate medical attention from a qualified healthcare professional.</p>
+                </div>
+            </div>
+            
+            <div class="terms-footer">
+                <div style="text-align: center; margin-bottom: 1rem;">
+                    <a href="{% url 'terms' %}" target="_blank" style="color: var(--accent-cyan); text-decoration: none; font-size: 0.9rem;">
+                        <i class="fas fa-external-link-alt"></i> Read Full Terms & Conditions
+                    </a>
+                </div>
+                <div class="terms-checkbox">
+                    <input type="checkbox" id="termsAccept" />
+                    <label for="termsAccept">I have read and agree to the Terms & Conditions</label>
+                </div>
+                <div class="terms-buttons">
+                    <button onclick="acceptTerms()" class="btn btn-primary" id="acceptTermsBtn" disabled>
+                        <i class="fas fa-check"></i> Accept & Continue
+                    </button>
+                    <button onclick="declineTerms()" class="btn btn-outline">
+                        <i class="fas fa-times"></i> Decline
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Medical Disclaimer Badge (Subtle, Bottom-Right) -->
+    {% if user.is_authenticated and not user.is_staff %}
+    <div class="info-badge" onclick="showInfoModal()" title="View Important Information">
+        <i class="fas fa-info-circle"></i>
+    </div>
+    {% endif %}
+    
+    <!-- Info Modal (Softer Disclaimer) -->
+    <div class="info-modal" id="infoModal">
+        <div class="info-content">
+            <div class="info-header">
+                <i class="fas fa-info-circle"></i>
+                <h2>Important Information</h2>
+                <button class="info-close" onclick="hideInfoModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="info-body">
+                <div class="info-card">
+                    <div class="info-icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <h3>Educational Tool</h3>
+                    <p>SkinCare AI is designed to help you learn about skin health and raise awareness about skin conditions.</p>
+                </div>
+                
+                <div class="info-card">
+                    <div class="info-icon">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <h3>AI-Powered Analysis</h3>
+                    <p>Our system uses advanced AI trained on medical datasets to analyze skin lesion images. Results are predictions, not diagnoses.</p>
+                </div>
+                
+                <div class="info-card">
+                    <div class="info-icon">
+                        <i class="fas fa-camera"></i>
+                    </div>
+                    <h3>Image Quality Matters</h3>
+                    <p>Photos are taken with standard cameras, not medical equipment. Lighting, focus, and quality affect results.</p>
+                </div>
+                
+                <div class="info-card">
+                    <div class="info-icon">
+                        <i class="fas fa-user-md"></i>
+                    </div>
+                    <h3>Consult a Professional</h3>
+                    <p>For any skin health concerns, always consult a qualified dermatologist who can provide proper medical evaluation and treatment.</p>
+                </div>
+                
+                <div class="info-reminder">
+                    <i class="fas fa-heart"></i>
+                    <p>Your health is important. Use this tool as a learning resource, but always seek professional medical advice for health decisions.</p>
+                </div>
+            </div>
+            
+            <div class="info-footer">
+                <button onclick="hideInfoModal()" class="btn btn-primary">
+                    <i class="fas fa-check"></i> Got It
+                </button>
+            </div>
+        </div>
     </div>
 
     <!-- Main Content -->
@@ -803,6 +984,15 @@
         <p style="font-size: 0.9rem; margin-top: 0.5rem; color: var(--text-muted);">
             <i class="fas fa-shield-alt"></i> For educational purposes only. Consult a dermatologist for medical advice.
         </p>
+        <p style="font-size: 0.85rem; margin-top: 0.75rem;">
+            <a href="{% url 'terms' %}" style="color: var(--accent-cyan); text-decoration: none; margin: 0 0.5rem;">
+                <i class="fas fa-file-contract"></i> Terms & Conditions
+            </a>
+            |
+            <a href="{% url 'about' %}" style="color: var(--accent-cyan); text-decoration: none; margin: 0 0.5rem;">
+                <i class="fas fa-info-circle"></i> About
+            </a>
+        </p>
     </footer>
 
     <!-- Scroll Animation Script -->
@@ -842,7 +1032,20 @@
         }, 5000);
     </script>
 
+    <!-- Tooltip System JavaScript -->
+    <script src="{% static 'js/tooltips.js' %}"></script>
+    
+    <!-- DermaGenie Widget JavaScript -->
+    <script src="{% static 'js/dermagenie-widget.js">
+    
+    <!-- Mobile Navigation JavaScript -->
+    <script src="{% static 'js/mobile-navigation.js' %}' %}"></script>
+
     {% block extra_js %}{% endblock %}
 </body>
 
 </html>
+
+
+
+

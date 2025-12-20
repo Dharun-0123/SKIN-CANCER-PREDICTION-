@@ -1,0 +1,215 @@
+/* ========================================
+   📱 MOBILE NAVIGATION STYLES
+   ======================================== */
+
+/* Mobile Navigation Toggle Button */
+.mobile-nav-toggle {
+    display: none;
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    z-index: 1001;
+}
+
+.mobile-nav-toggle:hover {
+    background: rgba(168, 85, 247, 0.1);
+    color: var(--accent-purple);
+}
+
+.mobile-nav-toggle:focus {
+    outline: 2px solid var(--accent-purple);
+    outline-offset: 2px;
+}
+
+/* Mobile Navigation Menu */
+.mobile-nav-menu {
+    position: fixed;
+    top: 5rem;
+    left: 0;
+    right: 0;
+    background: rgba(10, 10, 15, 0.98);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(168, 85, 247, 0.2);
+    transform: translateY(-100%);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 999;
+    max-height: calc(100vh - 5rem);
+    overflow-y: auto;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.mobile-nav-menu.active {
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Mobile Navigation Links */
+.mobile-nav-menu .nav-links {
+    flex-direction: column;
+    gap: 0;
+    padding: 1rem;
+    list-style: none;
+}
+
+.mobile-nav-menu .nav-links li {
+    width: 100%;
+    margin-bottom: 0.5rem;
+}
+
+.mobile-nav-menu .nav-links a {
+    width: 100%;
+    padding: 1rem 1.25rem;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 500;
+    justify-content: flex-start;
+    background: rgba(26, 26, 36, 0.6);
+    border: 1px solid rgba(168, 85, 247, 0.1);
+    color: var(--text-primary);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    transition: all 0.3s ease;
+}
+
+.mobile-nav-menu .nav-links a:hover {
+    background: rgba(168, 85, 247, 0.2);
+    border-color: rgba(168, 85, 247, 0.3);
+    transform: translateX(4px);
+    color: var(--text-primary);
+}
+
+.mobile-nav-menu .nav-links a i {
+    width: 1.5rem;
+    text-align: center;
+    font-size: 1.1rem;
+}
+
+/* Special styling for admin links */
+.mobile-nav-menu .nav-links a[style*="color: #fbbf24"] {
+    background: rgba(251, 191, 36, 0.1);
+    border-color: rgba(251, 191, 36, 0.3);
+}
+
+.mobile-nav-menu .nav-links a[style*="color: #ef4444"] {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: rgba(239, 68, 68, 0.3);
+}
+
+/* Button styling in mobile menu */
+.mobile-nav-menu .btn-inline {
+    margin: 0.25rem 0;
+    text-align: center;
+    justify-content: center;
+}
+
+.mobile-nav-menu .btn-outline {
+    background: transparent;
+    border: 2px solid rgba(168, 85, 247, 0.3);
+}
+
+.mobile-nav-menu .btn-primary {
+    background: var(--gradient-primary);
+    border: none;
+}
+
+/* Mobile-specific responsive behavior */
+@media (max-width: 767px) {
+    /* Hide desktop navigation */
+    .navbar .nav-links {
+        display: none !important;
+    }
+    
+    /* Show mobile toggle */
+    .mobile-nav-toggle {
+        display: block;
+    }
+    
+    /* Ensure mobile menu is properly positioned */
+    .mobile-nav-menu {
+        top: 4.5rem; /* Adjust based on mobile navbar height */
+    }
+}
+
+/* Tablet adjustments */
+@media (max-width: 1024px) and (min-width: 768px) {
+    .mobile-nav-toggle {
+        display: none;
+    }
+    
+    .mobile-nav-menu {
+        display: none;
+    }
+}
+
+/* Animation for smooth menu appearance */
+@keyframes slideDown {
+    from {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+}
+
+/* Accessibility improvements */
+.mobile-nav-toggle:focus-visible {
+    outline: 2px solid var(--accent-cyan);
+    outline-offset: 2px;
+}
+
+.mobile-nav-menu .nav-links a:focus-visible {
+    outline: 2px solid var(--accent-cyan);
+    outline-offset: 2px;
+}
+
+/* Prevent body scroll when menu is open */
+body.mobile-nav-open {
+    overflow: hidden;
+}
+
+/* Loading state for mobile menu */
+.mobile-nav-menu.loading {
+    pointer-events: none;
+}
+
+.mobile-nav-menu.loading::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 2rem;
+    height: 2rem;
+    border: 2px solid rgba(168, 85, 247, 0.3);
+    border-top: 2px solid var(--accent-purple);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    transform: translate(-50%, -50%);
+}
+
+@keyframes spin {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+}

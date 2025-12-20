@@ -50,6 +50,7 @@ class UserProfile(models.Model):
     profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
     email_verified = models.BooleanField(default=False)  # Email verification status
     email_notifications = models.BooleanField(default=True)
+    first_analysis_email_sent = models.BooleanField(default=False)  # Track if first analysis email sent
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -80,9 +81,18 @@ def save_user_profile(sender, instance, **kwargs):
 
 
 class UserPredictModel(models.Model):
+    MODEL_CHOICES = [
+        ('auto', 'Auto (Smart Selection)'),
+        ('efficientnet', 'EfficientNetB0 (Primary)'),
+        ('cnn', 'CNN (Secondary)'),
+    ]
+    
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     image = models.ImageField(upload_to = 'images/')
     label = models.CharField(max_length=200, default='data')
+    model_preference = models.CharField(max_length=20, choices=MODEL_CHOICES, default='auto')
+    model_used = models.CharField(max_length=50, blank=True, null=True)  # Which model was actually used
+    confidence_score = models.FloatField(blank=True, null=True)  # Confidence of the prediction
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -137,5 +147,36 @@ class EmailOTP(models.Model):
         obj, created = cls.objects.update_or_create(
             user=user,
             defaults={'otp': otp, 'is_verified': False}
+        )
+        return obj
+
+
+# Password Reset OTP Model
+class PasswordResetOTP(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='password_reset_otp')
+    otp = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_used = models.BooleanField(default=False)
+    
+    class Meta:
+        verbose_name = 'Password Reset OTP'
+        verbose_name_plural = 'Password Reset OTPs'
+    
+    def __str__(self):
+        return f"Password Reset OTP for {self.user.username}"
+    
+    def is_expired(self):
+        """Check if OTP is expired (15 minutes for password reset)"""
+        from django.utils import timezone
+        from datetime import timedelta
+        expiry_time = self.created_at + timedelta(minutes=15)  # 15 minutes for password reset
+        return timezone.now() > expiry_time
+    
+    @classmethod
+    def create_or_update(cls, user, otp):
+        """Create or update password reset OTP for user"""
+        obj, created = cls.objects.update_or_create(
+            user=user,
+            defaults={'otp': otp, 'is_used': False}
         )
         return obj

@@ -1,0 +1,310 @@
+{% extends 'base.html' %}
+
+{% block title %}Verify Reset Code - SkinCare AI{% endblock %}
+
+{% block extra_css %}
+<style>
+    .verify-otp-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+        background: linear-gradient(135deg, rgba(168, 85, 247, 0.1) 0%, rgba(6, 182, 212, 0.1) 100%);
+    }
+
+    .verify-otp-card {
+        background: var(--bg-card);
+        backdrop-filter: blur(15px);
+        border: 1px solid rgba(168, 85, 247, 0.3);
+        border-radius: 20px;
+        padding: 3rem 2rem;
+        width: 100%;
+        max-width: 500px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .verify-otp-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--gradient-primary);
+    }
+
+    .verify-otp-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .verify-otp-header h1 {
+        font-size: 2.5rem;
+        font-weight: 800;
+        background: var(--gradient-primary);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 0.5rem;
+    }
+
+    .verify-otp-header p {
+        color: var(--text-gray);
+        font-size: 1.1rem;
+        line-height: 1.6;
+    }
+
+    .user-info {
+        background: rgba(6, 182, 212, 0.1);
+        border: 1px solid rgba(6, 182, 212, 0.3);
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+
+    .user-info i {
+        color: var(--accent-cyan);
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .user-info p {
+        color: var(--text-primary);
+        margin: 0;
+        font-weight: 600;
+    }
+
+    .form-group {
+        margin-bottom: 2rem;
+    }
+
+    .form-group label {
+        display: block;
+        color: var(--text-primary);
+        font-weight: 600;
+        margin-bottom: 0.8rem;
+        font-size: 1rem;
+        text-align: center;
+    }
+
+    .otp-input {
+        width: 100%;
+        padding: 1.5rem;
+        background: rgba(26, 26, 36, 0.8);
+        border: 2px solid rgba(168, 85, 247, 0.3);
+        border-radius: 12px;
+        color: var(--text-primary);
+        font-size: 2rem;
+        font-weight: 700;
+        text-align: center;
+        letter-spacing: 0.5rem;
+        transition: all 0.3s ease;
+        box-sizing: border-box;
+    }
+
+    .otp-input:focus {
+        outline: none;
+        border-color: var(--accent-cyan);
+        box-shadow: 0 0 20px rgba(6, 182, 212, 0.3);
+        background: rgba(26, 26, 36, 0.9);
+    }
+
+    .otp-input::placeholder {
+        color: var(--text-gray);
+        opacity: 0.5;
+        letter-spacing: 0.3rem;
+    }
+
+    .btn-primary {
+        width: 100%;
+        padding: 1rem 2rem;
+        background: var(--gradient-primary);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 1.1rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-bottom: 1.5rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-primary::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s;
+    }
+
+    .btn-primary:hover::before {
+        left: 100%;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 30px rgba(168, 85, 247, 0.4);
+    }
+
+    .btn-secondary {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--accent-cyan);
+        text-decoration: none;
+        font-weight: 600;
+        padding: 0.8rem 1.5rem;
+        border: 2px solid var(--accent-cyan);
+        border-radius: 10px;
+        transition: all 0.3s ease;
+        justify-content: center;
+        width: 100%;
+        box-sizing: border-box;
+        margin-bottom: 1rem;
+    }
+
+    .btn-secondary:hover {
+        background: var(--accent-cyan);
+        color: var(--bg-primary);
+        transform: translateY(-2px);
+    }
+
+    .resend-section {
+        text-align: center;
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid rgba(168, 85, 247, 0.2);
+    }
+
+    .timer-info {
+        background: rgba(239, 68, 68, 0.1);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        border-radius: 10px;
+        padding: 1rem;
+        margin-bottom: 2rem;
+        color: var(--text-gray);
+        text-align: center;
+    }
+
+    .timer-info i {
+        color: #ef4444;
+        margin-right: 0.5rem;
+    }
+
+    /* Responsive design */
+    @media (max-width: 768px) {
+        .verify-otp-container {
+            padding: 1rem;
+        }
+        
+        .verify-otp-card {
+            padding: 2rem 1.5rem;
+        }
+        
+        .verify-otp-header h1 {
+            font-size: 2rem;
+        }
+        
+        .otp-input {
+            font-size: 1.5rem;
+            letter-spacing: 0.3rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="verify-otp-container">
+    <div class="verify-otp-card">
+        <div class="verify-otp-header">
+            <h1><i class="fas fa-shield-alt"></i> Verify Reset Code</h1>
+            <p>Enter the 6-digit code we sent to your email address.</p>
+        </div>
+
+        <div class="user-info">
+            <i class="fas fa-envelope"></i>
+            <p>Code sent to: {{ user.email }}</p>
+        </div>
+
+        <div class="timer-info">
+            <i class="fas fa-clock"></i>
+            <strong>Important:</strong> This code will expire in 15 minutes for security reasons.
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="otp">
+                    <i class="fas fa-key"></i> Enter 6-Digit Code
+                </label>
+                <input 
+                    type="text" 
+                    class="otp-input" 
+                    id="otp" 
+                    name="otp" 
+                    placeholder="000000"
+                    maxlength="6"
+                    pattern="[0-9]{6}"
+                    required
+                    autocomplete="one-time-code"
+                    inputmode="numeric"
+                >
+            </div>
+
+            <button type="submit" class="btn-primary">
+                <i class="fas fa-check"></i>
+                Verify Code
+            </button>
+        </form>
+
+        <div class="resend-section">
+            <p style="color: var(--text-gray); margin-bottom: 1rem;">
+                Didn't receive the code?
+            </p>
+            <a href="{% url 'resend_reset_otp' %}" class="btn-secondary">
+                <i class="fas fa-redo"></i>
+                Resend Code
+            </a>
+            <a href="{% url 'forgot_password' %}" class="btn-secondary">
+                <i class="fas fa-arrow-left"></i>
+                Back to Email Entry
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+// Auto-focus on OTP input
+document.addEventListener('DOMContentLoaded', function() {
+    const otpInput = document.getElementById('otp');
+    otpInput.focus();
+    
+    // Auto-submit when 6 digits are entered
+    otpInput.addEventListener('input', function() {
+        if (this.value.length === 6) {
+            // Small delay to show the complete code
+            setTimeout(() => {
+                this.form.submit();
+            }, 500);
+        }
+    });
+    
+    // Only allow numbers
+    otpInput.addEventListener('keypress', function(e) {
+        if (!/[0-9]/.test(e.key) && !['Backspace', 'Delete', 'Tab', 'Enter'].includes(e.key)) {
+            e.preventDefault();
+        }
+    });
+});
+</script>
+{% endblock %}

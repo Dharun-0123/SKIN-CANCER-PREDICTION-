@@ -1,0 +1,726 @@
+/* ========================================
+   📱 COMPREHENSIVE MOBILE RESPONSIVENESS
+   SkinCare AI - Enhanced Mobile Experience
+   ======================================== */
+
+/* ========================================
+   🎯 MOBILE-FIRST APPROACH
+   ======================================== */
+
+/* Base Mobile Styles (320px+) */
+:root {
+    --mobile-padding: 1rem;
+    --mobile-margin: 0.75rem;
+    --mobile-font-base: 0.9rem;
+    --mobile-font-small: 0.8rem;
+    --mobile-font-large: 1.1rem;
+    --mobile-button-height: 44px; /* Apple's recommended touch target */
+    --mobile-input-height: 48px;
+    --mobile-nav-height: 60px;
+}
+
+/* ========================================
+   🧭 MOBILE NAVIGATION ENHANCEMENTS
+   ======================================== */
+
+/* Mobile Navigation Toggle */
+.mobile-nav-toggle {
+    display: none;
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.mobile-nav-toggle:hover {
+    background: rgba(168, 85, 247, 0.1);
+    color: var(--accent-purple);
+}
+
+/* Mobile Navigation Menu */
+.mobile-nav-menu {
+    position: fixed;
+    top: var(--mobile-nav-height);
+    left: 0;
+    right: 0;
+    background: rgba(10, 10, 15, 0.98);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(168, 85, 247, 0.3);
+    transform: translateY(-100%);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 999;
+    max-height: calc(100vh - var(--mobile-nav-height));
+    overflow-y: auto;
+}
+
+.mobile-nav-menu.active {
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+}
+
+.mobile-nav-menu .nav-links {
+    flex-direction: column;
+    padding: 1rem;
+    gap: 0.5rem;
+}
+
+.mobile-nav-menu .nav-links a {
+    width: 100%;
+    padding: 1rem;
+    text-align: left;
+    border-radius: 12px;
+    font-size: var(--mobile-font-large);
+    min-height: var(--mobile-button-height);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.mobile-nav-menu .dropdown-menu {
+    position: static;
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    background: rgba(168, 85, 247, 0.1);
+    border: 1px solid rgba(168, 85, 247, 0.2);
+    margin: 0.5rem 0;
+    border-radius: 12px;
+}
+
+/* ========================================
+   📋 MOBILE FORM ENHANCEMENTS
+   ======================================== */
+
+/* Mobile-Optimized Form Controls */
+@media (max-width: 768px) {
+    .form-control,
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="file"],
+    select,
+    textarea {
+        min-height: var(--mobile-input-height) !important;
+        font-size: 16px !important; /* Prevents zoom on iOS */
+        padding: 0.75rem 1rem !important;
+        border-radius: 12px !important;
+        border: 2px solid rgba(168, 85, 247, 0.3) !important;
+        background: var(--bg-card) !important;
+        color: var(--text-primary) !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+    
+    .form-control:focus,
+    input:focus,
+    select:focus,
+    textarea:focus {
+        border-color: var(--accent-purple) !important;
+        box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.2) !important;
+        outline: none !important;
+    }
+    
+    /* Mobile Button Optimization */
+    .btn {
+        min-height: var(--mobile-button-height) !important;
+        padding: 0.75rem 1.5rem !important;
+        font-size: var(--mobile-font-base) !important;
+        font-weight: 600 !important;
+        border-radius: 12px !important;
+        width: 100% !important;
+        margin-bottom: 0.75rem !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 0.5rem !important;
+        touch-action: manipulation !important;
+    }
+    
+    /* Inline buttons for specific cases */
+    .btn-inline {
+        width: auto !important;
+        display: inline-flex !important;
+        margin-right: 0.5rem !important;
+    }
+    
+    /* Form Groups Mobile Spacing */
+    .form-group {
+        margin-bottom: 1.5rem !important;
+    }
+    
+    .form-group label {
+        font-size: var(--mobile-font-base) !important;
+        font-weight: 600 !important;
+        margin-bottom: 0.5rem !important;
+        color: var(--text-primary) !important;
+    }
+}
+
+/* ========================================
+   🎨 MOBILE CARD & CONTAINER LAYOUTS
+   ======================================== */
+
+@media (max-width: 768px) {
+    /* Container Adjustments */
+    .container {
+        padding: 4rem 1rem 1rem !important;
+        max-width: 100% !important;
+    }
+    
+    /* Card Responsive Design */
+    .card {
+        margin: 0 0 1.5rem 0 !important;
+        padding: 1.5rem !important;
+        border-radius: 16px !important;
+    }
+    
+    /* Upload Container Mobile */
+    .upload-container {
+        margin: 1rem 0 !important;
+        padding: 0 1rem !important;
+        max-width: 100% !important;
+    }
+    
+    /* Login/Register Container Mobile */
+    .login-container,
+    .register-container {
+        margin: 1rem !important;
+        max-width: calc(100% - 2rem) !important;
+        border-radius: 16px !important;
+    }
+    
+    .login-header,
+    .register-header {
+        padding: 2rem 1.5rem !important;
+    }
+    
+    .login-body,
+    .register-body {
+        padding: 2rem 1.5rem !important;
+    }
+}
+
+/* ========================================
+   📊 MOBILE GRID SYSTEMS
+   ======================================== */
+
+/* Stats Grid Mobile Optimization */
+@media (max-width: 768px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 1rem !important;
+        margin-bottom: 2rem !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-grid {
+        grid-template-columns: 1fr !important;
+        gap: 1rem !important;
+    }
+}
+
+/* Results Grid Mobile */
+@media (max-width: 768px) {
+    .results-grid {
+        grid-template-columns: 1fr !important;
+        gap: 1rem !important;
+    }
+    
+    .analysis-grid {
+        grid-template-columns: 1fr !important;
+        gap: 1.5rem !important;
+    }
+}
+
+/* ========================================
+   🖼️ MOBILE IMAGE & MEDIA HANDLING
+   ======================================== */
+
+@media (max-width: 768px) {
+    /* Image Responsiveness */
+    .preview-image,
+    .result-image,
+    .analysis-image {
+        max-width: 100% !important;
+        height: auto !important;
+        border-radius: 12px !important;
+        margin: 1rem 0 !important;
+    }
+    
+    /* Upload Zone Mobile */
+    .upload-zone {
+        padding: 2rem 1rem !important;
+        margin: 1rem 0 !important;
+        border-radius: 12px !important;
+        min-height: 200px !important;
+    }
+    
+    .upload-zone i {
+        font-size: 2.5rem !important;
+    }
+    
+    .upload-zone h3 {
+        font-size: 1.2rem !important;
+        margin: 0.75rem 0 !important;
+    }
+    
+    .upload-zone p {
+        font-size: var(--mobile-font-small) !important;
+        margin: 0.5rem 0 !important;
+    }
+}
+
+/* ========================================
+   📝 MOBILE TYPOGRAPHY SYSTEM
+   ======================================== */
+
+@media (max-width: 768px) {
+    /* Heading Hierarchy Mobile */
+    h1 {
+        font-size: 2rem !important;
+        line-height: 1.2 !important;
+        margin-bottom: 1rem !important;
+    }
+    
+    h2 {
+        font-size: 1.5rem !important;
+        line-height: 1.3 !important;
+        margin-bottom: 0.75rem !important;
+    }
+    
+    h3 {
+        font-size: 1.25rem !important;
+        line-height: 1.4 !important;
+        margin-bottom: 0.5rem !important;
+    }
+    
+    h4 {
+        font-size: 1.1rem !important;
+        line-height: 1.4 !important;
+        margin-bottom: 0.5rem !important;
+    }
+    
+    /* Body Text Mobile */
+    p {
+        font-size: var(--mobile-font-base) !important;
+        line-height: 1.6 !important;
+        margin-bottom: 1rem !important;
+    }
+    
+    /* Small Text Mobile */
+    .text-small,
+    small {
+        font-size: var(--mobile-font-small) !important;
+    }
+    
+    /* Large Text Mobile */
+    .text-large {
+        font-size: var(--mobile-font-large) !important;
+    }
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 1.75rem !important;
+    }
+    
+    h2 {
+        font-size: 1.25rem !important;
+    }
+    
+    h3 {
+        font-size: 1.1rem !important;
+    }
+}
+
+/* ========================================
+   🎯 MOBILE TOUCH INTERACTIONS
+   ======================================== */
+
+/* Touch-Friendly Interactive Elements */
+@media (max-width: 768px) {
+    /* Minimum Touch Target Size */
+    .btn,
+    .nav-links a,
+    .dropdown-toggle,
+    .upload-zone,
+    input[type="checkbox"],
+    input[type="radio"] {
+        min-height: var(--mobile-button-height) !important;
+        min-width: var(--mobile-button-height) !important;
+    }
+    
+    /* Touch Feedback */
+    .btn:active,
+    .nav-links a:active,
+    .card:active {
+        transform: scale(0.98) !important;
+        transition: transform 0.1s ease !important;
+    }
+    
+    /* Remove Hover Effects on Touch Devices */
+    @media (hover: none) {
+        .btn:hover,
+        .card:hover,
+        .nav-links a:hover {
+            transform: none !important;
+            box-shadow: none !important;
+        }
+    }
+}
+
+/* ========================================
+   📱 MOBILE MODAL & OVERLAY ENHANCEMENTS
+   ======================================== */
+
+@media (max-width: 768px) {
+    /* Modal Mobile Optimization */
+    .terms-modal,
+    .info-modal {
+        padding: 1rem !important;
+    }
+    
+    .terms-content,
+    .info-content {
+        max-width: calc(100% - 2rem) !important;
+        margin: 2rem 1rem !important;
+        border-radius: 16px !important;
+        max-height: calc(100vh - 4rem) !important;
+        overflow-y: auto !important;
+    }
+    
+    .terms-header,
+    .info-header {
+        padding: 1.5rem !important;
+    }
+    
+    .terms-body,
+    .info-body {
+        padding: 1.5rem !important;
+        max-height: 60vh !important;
+        overflow-y: auto !important;
+    }
+    
+    .terms-footer,
+    .info-footer {
+        padding: 1.5rem !important;
+    }
+    
+    /* Modal Buttons Mobile */
+    .terms-buttons {
+        flex-direction: column !important;
+        gap: 0.75rem !important;
+    }
+    
+    .terms-buttons .btn {
+        width: 100% !important;
+    }
+}
+
+/* ========================================
+   🔍 MOBILE ANALYSIS RESULTS
+   ======================================== */
+
+@media (max-width: 768px) {
+    /* Results Layout Mobile */
+    .result-container {
+        padding: 1rem !important;
+    }
+    
+    .result-header {
+        padding: 1.5rem !important;
+        text-align: center !important;
+    }
+    
+    .result-body {
+        padding: 1.5rem !important;
+    }
+    
+    /* Confidence Bars Mobile */
+    .confidence-bar {
+        margin: 1rem 0 !important;
+    }
+    
+    .confidence-label {
+        font-size: var(--mobile-font-small) !important;
+        margin-bottom: 0.5rem !important;
+    }
+    
+    /* Result Actions Mobile */
+    .result-actions {
+        flex-direction: column !important;
+        gap: 0.75rem !important;
+        margin-top: 2rem !important;
+    }
+    
+    .result-actions .btn {
+        width: 100% !important;
+    }
+}
+
+/* ========================================
+   📊 MOBILE ANALYTICS & CHARTS
+   ======================================== */
+
+@media (max-width: 768px) {
+    /* Chart Container Mobile */
+    .chart-container {
+        padding: 1rem !important;
+        margin: 1rem 0 !important;
+    }
+    
+    /* Analytics Cards Mobile */
+    .analytics-card {
+        margin-bottom: 1.5rem !important;
+        padding: 1.5rem !important;
+    }
+    
+    /* Chart Responsive */
+    canvas {
+        max-width: 100% !important;
+        height: auto !important;
+    }
+}
+
+/* ========================================
+   🎨 MOBILE VISUAL ENHANCEMENTS
+   ======================================== */
+
+@media (max-width: 768px) {
+    /* Reduced Shadows for Performance */
+    .card,
+    .btn,
+    .modal-content {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+    }
+    
+    /* Simplified Gradients */
+    .btn-primary {
+        background: var(--accent-purple) !important;
+    }
+    
+    .btn-secondary {
+        background: var(--accent-cyan) !important;
+    }
+    
+    /* Mobile-Optimized Borders */
+    .card,
+    .form-control,
+    .btn {
+        border-width: 1px !important;
+    }
+}
+
+/* ========================================
+   🚀 MOBILE PERFORMANCE OPTIMIZATIONS
+   ======================================== */
+
+@media (max-width: 768px) {
+    /* Disable Animations on Mobile for Performance */
+    @media (prefers-reduced-motion: no-preference) {
+        * {
+            animation-duration: 0.2s !important;
+            transition-duration: 0.2s !important;
+        }
+    }
+    
+    /* GPU Acceleration for Smooth Scrolling */
+    .container,
+    .card,
+    .btn {
+        transform: translateZ(0) !important;
+        backface-visibility: hidden !important;
+    }
+    
+    /* Optimize Images for Mobile */
+    img {
+        image-rendering: optimizeQuality !important;
+        image-rendering: -webkit-optimize-contrast !important;
+    }
+}
+
+/* ========================================
+   📱 DEVICE-SPECIFIC OPTIMIZATIONS
+   ======================================== */
+
+/* iPhone SE and Small Devices (375px) */
+@media (max-width: 375px) {
+    :root {
+        --mobile-padding: 0.75rem;
+        --mobile-margin: 0.5rem;
+        --mobile-font-base: 0.85rem;
+        --mobile-font-small: 0.75rem;
+    }
+    
+    .container {
+        padding: 4rem 0.75rem 1rem !important;
+    }
+    
+    .card {
+        padding: 1rem !important;
+    }
+    
+    .btn {
+        padding: 0.625rem 1rem !important;
+        font-size: 0.85rem !important;
+    }
+}
+
+/* Large Mobile Devices (414px+) */
+@media (min-width: 414px) and (max-width: 768px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+    
+    .btn {
+        max-width: 300px !important;
+        margin: 0 auto 0.75rem auto !important;
+    }
+}
+
+/* ========================================
+   🎯 MOBILE ACCESSIBILITY ENHANCEMENTS
+   ======================================== */
+
+@media (max-width: 768px) {
+    /* Focus Indicators Mobile */
+    *:focus-visible {
+        outline: 3px solid var(--accent-cyan) !important;
+        outline-offset: 2px !important;
+    }
+    
+    /* High Contrast Mode Support */
+    @media (prefers-contrast: high) {
+        .card {
+            border-width: 2px !important;
+            border-color: var(--text-primary) !important;
+        }
+        
+        .btn {
+            border: 2px solid currentColor !important;
+        }
+    }
+    
+    /* Reduced Motion Support */
+    @media (prefers-reduced-motion: reduce) {
+        * {
+            animation: none !important;
+            transition: none !important;
+        }
+    }
+}
+
+/* ========================================
+   🌐 MOBILE LANDSCAPE ORIENTATION
+   ======================================== */
+
+@media (max-width: 768px) and (orientation: landscape) {
+    /* Landscape Mobile Adjustments */
+    .container {
+        padding: 3rem 1rem 1rem !important;
+    }
+    
+    .navbar {
+        padding: 0.5rem 1rem !important;
+    }
+    
+    .mobile-nav-menu {
+        max-height: calc(100vh - 50px) !important;
+    }
+    
+    /* Landscape Modal Adjustments */
+    .terms-content,
+    .info-content {
+        max-height: calc(100vh - 2rem) !important;
+        margin: 1rem !important;
+    }
+}
+
+/* ========================================
+   📱 MOBILE UTILITY CLASSES
+   ======================================== */
+
+/* Mobile-Only Display */
+.mobile-only {
+    display: none !important;
+}
+
+@media (max-width: 768px) {
+    .mobile-only {
+        display: block !important;
+    }
+    
+    .mobile-hidden {
+        display: none !important;
+    }
+    
+    .mobile-flex {
+        display: flex !important;
+    }
+    
+    .mobile-grid {
+        display: grid !important;
+    }
+}
+
+/* Mobile Text Alignment */
+@media (max-width: 768px) {
+    .mobile-text-center {
+        text-align: center !important;
+    }
+    
+    .mobile-text-left {
+        text-align: left !important;
+    }
+    
+    .mobile-text-right {
+        text-align: right !important;
+    }
+}
+
+/* Mobile Spacing Utilities */
+@media (max-width: 768px) {
+    .mobile-mt-0 { margin-top: 0 !important; }
+    .mobile-mt-1 { margin-top: 0.5rem !important; }
+    .mobile-mt-2 { margin-top: 1rem !important; }
+    .mobile-mt-3 { margin-top: 1.5rem !important; }
+    
+    .mobile-mb-0 { margin-bottom: 0 !important; }
+    .mobile-mb-1 { margin-bottom: 0.5rem !important; }
+    .mobile-mb-2 { margin-bottom: 1rem !important; }
+    .mobile-mb-3 { margin-bottom: 1.5rem !important; }
+    
+    .mobile-p-0 { padding: 0 !important; }
+    .mobile-p-1 { padding: 0.5rem !important; }
+    .mobile-p-2 { padding: 1rem !important; }
+    .mobile-p-3 { padding: 1.5rem !important; }
+}
+
+/* ========================================
+   🎯 MOBILE DEBUGGING (Development Only)
+   ======================================== */
+
+/* Uncomment for mobile debugging */
+/*
+@media (max-width: 768px) {
+    * {
+        outline: 1px solid red !important;
+    }
+    
+    .container {
+        background: rgba(255, 0, 0, 0.1) !important;
+    }
+    
+    .card {
+        background: rgba(0, 255, 0, 0.1) !important;
+    }
+}
+*/

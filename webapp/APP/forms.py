@@ -37,5 +37,15 @@ class ProfileUpdateForm(forms.ModelForm):
 class UserPredictForm(forms.ModelForm):
     class Meta:
         model = UserPredictModel
-        fields = ['image']
+        fields = ['image', 'model_preference']
+        widgets = {
+            'model_preference': forms.Select(attrs={
+                'class': 'form-control model-selector',
+                'id': 'model-selector'
+            }),
+            'image': forms.FileInput(attrs={
+                'class': 'form-control',
+                'accept': 'image/*'
+            })
+        }
 

@@ -114,13 +114,13 @@
     }
 
     .upload-zone {
-        border: 3px dashed rgba(168, 85, 247, 0.3);
-        border-radius: 16px;
-        padding: 3rem 2rem;
+        border: 2px dashed rgba(168, 85, 247, 0.3);
+        border-radius: 12px;
+        padding: 2rem 1.5rem;
         text-align: center;
         transition: all 0.3s ease;
         cursor: pointer;
-        background: rgba(26, 26, 36, 0.6);
+        background: rgba(26, 26, 36, 0.4);
     }
 
     .upload-zone:hover {
@@ -136,16 +136,17 @@
     }
 
     .upload-zone i {
-        font-size: 4rem;
+        font-size: 3rem;
         color: var(--accent-purple);
-        margin-bottom: 1rem;
+        margin-bottom: 0.75rem;
         text-shadow: 0 0 20px rgba(168, 85, 247, 0.5);
     }
 
     .upload-zone h3 {
         color: var(--text-primary);
-        font-size: 1.5rem;
+        font-size: 1.3rem;
         margin-bottom: 0.5rem;
+        font-weight: 600;
     }
 
     .upload-zone p {
@@ -201,82 +202,25 @@
         margin-top: 1rem;
     }
 
-    .result-container {
-        margin-top: 3rem;
-        padding: 2rem;
-        background: rgba(26, 26, 36, 0.6);
-        border-radius: 16px;
-        border: 1px solid rgba(168, 85, 247, 0.3);
-        box-shadow: 0 8px 32px rgba(168, 85, 247, 0.2);
+    /* Results are now displayed on a dedicated page */
+
+    /* Medical Disclaimer Compact Styling */
+    .medical-disclaimer-compact:hover {
+        background: rgba(59, 130, 246, 0.12);
+        border-color: rgba(59, 130, 246, 0.3);
+        transition: all 0.2s ease;
     }
 
-    .result-header {
-        text-align: center;
-        margin-bottom: 2rem;
+    /* Model Selector Hover Effects */
+    #model-selector:hover {
+        border-color: rgba(168, 85, 247, 0.4);
+        box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.1);
     }
 
-    .result-header h3 {
-        font-size: 2rem;
-        font-weight: 700;
-        color: var(--text-primary);
-        margin-bottom: 1rem;
-        text-shadow: 0 0 20px rgba(168, 85, 247, 0.3);
-    }
-
-    .result-badge {
-        display: inline-block;
-        padding: 0.75rem 2rem;
-        background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
-        color: var(--text-primary);
-        border-radius: 50px;
-        font-weight: 700;
-        font-size: 1.2rem;
-        margin-bottom: 1rem;
-        box-shadow: 0 0 30px rgba(168, 85, 247, 0.5);
-        text-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-    }
-
-    .result-section {
-        background: var(--bg-card);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(168, 85, 247, 0.2);
-        padding: 1.5rem;
-        border-radius: 12px;
-        margin-bottom: 1.5rem;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-        transition: all 0.3s ease;
-    }
-    
-    .result-section:hover {
-        transform: translateY(-2px);
-        border-color: var(--accent-cyan);
-        box-shadow: 0 8px 24px rgba(6, 182, 212, 0.3);
-    }
-
-    .result-section h4 {
-        color: var(--accent-cyan);
-        font-weight: 700;
-        margin-bottom: 1rem;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        letter-spacing: -0.01em;
-        text-shadow: 0 0 15px rgba(6, 182, 212, 0.3);
-    }
-
-    .result-section p {
-        color: var(--text-secondary);
-        line-height: 1.8;
-        margin: 0;
-        font-size: 1rem;
-    }
-
-    .result-actions {
-        display: flex;
-        gap: 1rem;
-        margin-top: 2rem;
-        justify-content: center;
-        flex-wrap: wrap;
+    #model-selector:focus {
+        outline: none;
+        border-color: var(--accent-purple);
+        box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.2);
     }
 
     @media (max-width: 768px) {
@@ -286,6 +230,23 @@
         
         .result-actions {
             flex-direction: column;
+        }
+        
+        .medical-disclaimer-compact {
+            font-size: 0.8rem;
+            padding: 0.625rem 0.875rem;
+        }
+        
+        .upload-zone {
+            padding: 1.5rem 1rem;
+        }
+        
+        .upload-zone i {
+            font-size: 2.5rem;
+        }
+        
+        .upload-zone h3 {
+            font-size: 1.2rem;
         }
     }
 </style>
@@ -304,11 +265,69 @@
             <form method="POST" enctype="multipart/form-data" id="uploadForm">
                 {% csrf_token %}
                 
-                <div class="upload-zone" id="uploadZone">
+                <!-- Model Selection - Improved -->
+                <div class="model-selector-container" style="margin-bottom: 1.5rem;">
+                    <h4 style="color: var(--text-primary); margin-bottom: 0.75rem; font-size: 1.1rem; font-weight: 600;" data-tooltip="model-selection">
+                        <i class="fas fa-brain" style="color: var(--accent-purple); margin-right: 0.5rem;"></i> AI Model Selection
+                    </h4>
+                    <div class="model-options">
+                        <select name="model_preference" id="model-selector" class="form-control" style="
+                            width: 100%;
+                            padding: 0.875rem 1rem;
+                            border: 1px solid rgba(168, 85, 247, 0.25);
+                            border-radius: 10px;
+                            background: var(--bg-card);
+                            color: var(--text-primary);
+                            font-size: 0.95rem;
+                            transition: all 0.3s ease;
+                            cursor: pointer;
+                        ">
+                            <option value="auto">🤖 Auto (Smart Selection) - Recommended</option>
+                            <option value="efficientnet">🧠 EfficientNetB0 (Primary) - 25,331 images</option>
+                            <option value="cnn">⚡ CNN (Secondary) - 3,297 images</option>
+                        </select>
+                        <div class="model-info" style="margin-top: 0.5rem; font-size: 0.8rem; color: var(--text-secondary); line-height: 1.3;">
+                            <span id="model-description">Auto mode intelligently selects the best model for your image</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Medical Disclaimer - Compact Version -->
+                <div class="medical-disclaimer-compact" style="
+                    background: rgba(59, 130, 246, 0.08);
+                    border: 1px solid rgba(59, 130, 246, 0.2);
+                    border-radius: 8px;
+                    padding: 0.75rem 1rem;
+                    margin-bottom: 1.5rem;
+                    font-size: 0.85rem;
+                    line-height: 1.4;
+                ">
+                    <div style="display: flex; align-items: flex-start; gap: 0.5rem;">
+                        <i class="fas fa-info-circle" style="color: #3b82f6; margin-top: 0.1rem; font-size: 0.9rem;"></i>
+                        <span style="color: var(--text-secondary);">
+                            <strong style="color: var(--text-primary);">AI Analysis Tool:</strong> 
+                            Results are predictions, not medical diagnoses. 
+                            <span data-tooltip="consult-doctor" style="color: #3b82f6; text-decoration: underline; cursor: help;">Consult a healthcare professional</span> for medical concerns.
+                        </span>
+                    </div>
+                </div>
+
+                <div class="upload-zone" id="uploadZone" data-tooltip="image-upload">
                     <i class="fas fa-cloud-upload-alt"></i>
-                    <h3>Drop your image here</h3>
-                    <p>or click to browse</p>
-                    <p style="font-size: 0.9rem; color: var(--gray);">Supported formats: JPG, PNG (Max 10MB)</p>
+                    <h3 style="margin-bottom: 0.5rem;">Drop your image here</h3>
+                    <p style="margin-bottom: 1rem; color: var(--text-secondary);">or click to browse</p>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem; font-size: 0.85rem;">
+                        <div style="color: var(--text-secondary);" data-tooltip="image-quality">
+                            <i class="fas fa-file-image" style="margin-right: 0.25rem; color: var(--accent-cyan);"></i>
+                            Supported: JPG, PNG (Max 10MB)
+                        </div>
+                        <div style="color: var(--text-secondary);">
+                            <i class="fas fa-lightbulb" style="margin-right: 0.25rem; color: #fbbf24;"></i>
+                            Tip: Use good lighting and focus for best results
+                        </div>
+                    </div>
+                    
                     <input 
                         type="file" 
                         name="image" 
@@ -334,48 +353,7 @@
         </div>
     </div>
 
-    {% if obj %}
-    <div class="result-container">
-        <div class="result-header">
-            <h3><i class="fas fa-check-circle" style="color: var(--success-color);"></i> Analysis Complete</h3>
-            <div class="result-badge">{{ predict }}</div>
-            <div class="preview-container">
-                <img src="{{ obj.image.url }}" class="preview-image" alt="Analyzed Image">
-            </div>
-        </div>
-
-        <div class="result-section">
-            <h4><i class="fas fa-info-circle"></i> Description</h4>
-            <p>{{ predict }}</p>
-        </div>
-
-        {% if b %}
-        <div class="result-section">
-            <h4><i class="fas fa-shield-alt"></i> Prevention</h4>
-            <p>{{ b }}</p>
-        </div>
-        {% endif %}
-
-        {% if c %}
-        <div class="result-section">
-            <h4><i class="fas fa-exclamation-triangle"></i> Precautions</h4>
-            <p>{{ c }}</p>
-        </div>
-        {% endif %}
-
-        <div class="result-actions">
-            <a href="{% url 'analyze' %}" class="btn btn-primary">
-                <i class="fas fa-redo"></i> Analyze Another Image
-            </a>
-            <a href="{% url 'history' %}" class="btn btn-secondary">
-                <i class="fas fa-history"></i> View History
-            </a>
-            <a href="{% url 'home' %}" class="btn btn-outline">
-                <i class="fas fa-home"></i> Back to Home
-            </a>
-        </div>
-    </div>
-    {% endif %}
+    <!-- Results are now displayed on a dedicated page -->
 </div>
 
 <script>
@@ -433,9 +411,54 @@
         submitBtn.disabled = true;
     }
 
+    // Model selector functionality
+    const modelSelector = document.getElementById('model-selector');
+    const modelDescription = document.getElementById('model-description');
+    
+    const modelDescriptions = {
+        'auto': 'Auto mode intelligently selects the best model for your image',
+        'efficientnet': 'EfficientNetB0: Modern architecture trained on 25,331 professional medical images (ISIC 2019)',
+        'cnn': 'CNN: Reliable model trained on 3,297 images with 94.1% accuracy on training data'
+    };
+    
+    modelSelector.addEventListener('change', function() {
+        const selectedModel = this.value;
+        modelDescription.textContent = modelDescriptions[selectedModel] || modelDescriptions['auto'];
+        
+        // Update submit button text based on selection
+        const submitText = {
+            'auto': '<i class="fas fa-brain"></i> Analyze Image (Auto)',
+            'efficientnet': '<i class="fas fa-brain"></i> Analyze with EfficientNetB0',
+            'cnn': '<i class="fas fa-brain"></i> Analyze with CNN'
+        };
+        
+        if (!submitBtn.disabled) {
+            submitBtn.innerHTML = submitText[selectedModel] || submitText['auto'];
+        }
+    });
+
     // Form submission
-    document.getElementById('uploadForm').addEventListener('submit', function() {
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing...';
+    document.getElementById('uploadForm').addEventListener('submit', function(e) {
+        const selectedModel = modelSelector.value;
+        
+        // Debug: Log form data
+        console.log('🔍 Form submission debug:');
+        console.log('Selected model:', selectedModel);
+        console.log('Form data:', new FormData(this));
+        
+        // Check if model_preference is in the form
+        const formData = new FormData(this);
+        for (let [key, value] of formData.entries()) {
+            console.log(`${key}: ${value}`);
+        }
+        
+        const loadingText = {
+            'auto': '<i class="fas fa-spinner fa-spin"></i> Analyzing (Auto Mode)...',
+            'efficientnet': '<i class="fas fa-spinner fa-spin"></i> Analyzing with EfficientNetB0...',
+            'cnn': '<i class="fas fa-spinner fa-spin"></i> Analyzing with CNN...'
+        };
+        
+        submitBtn.innerHTML = loadingText[selectedModel] || loadingText['auto'];
         submitBtn.disabled = true;
     });
 </script>

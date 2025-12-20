@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from . models import UserPredictModel, UserProfile
 from . forms import UserPredictForm, UserRegisterForm, UserUpdateForm, ProfileUpdateForm
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .email_utils import send_welcome_email, send_prediction_notification, send_profile_update_notification
@@ -14,6 +15,51 @@ from django.core.files.storage import FileSystemStorage
 import os
 from .models import predict
 import json
+
+
+def convert_numpy_types(obj):
+    """Convert numpy types to Python native types for JSON serialization"""
+    if obj is None:
+        return None
+    elif isinstance(obj, dict):
+        return {key: convert_numpy_types(value) for key, value in obj.items()}
+    elif isinstance(obj, list):
+        return [convert_numpy_types(item) for item in obj]
+    elif isinstance(obj, (np.integer, np.int32, np.int64)):
+        return int(obj)
+    elif isinstance(obj, (np.floating, np.float32, np.float64)):
+        return float(obj)
+    elif isinstance(obj, np.ndarray):
+        return obj.tolist()
+    else:
+        return obj
+
+
+def send_smart_analysis_notification(user, prediction, image_path):
+    """Send email notification only for first analysis to preserve email quota"""
+    try:
+        # Ensure user has a profile
+        if not hasattr(user, 'profile'):
+            UserProfile.objects.create(user=user)
+        
+        # Check if this is the first analysis and email notifications are enabled
+        if (user.profile.email_notifications and 
+            not user.profile.first_analysis_email_sent):
+            
+            # Send the first analysis email
+            from .email_utils import send_prediction_notification
+            send_prediction_notification(user, prediction, image_path)
+            
+            # Mark that first analysis email has been sent
+            user.profile.first_analysis_email_sent = True
+            user.profile.save()
+            
+            print(f"✅ First analysis email sent to {user.email}")
+        else:
+            print(f"📧 Email skipped for {user.email} (quota preservation)")
+            
+    except Exception as e:
+        print(f"❌ Email notification error: {str(e)}")
 
 
 
@@ -41,6 +87,11 @@ def home_minimal(request):
     return render(request, 'home_minimal.html')
 
 def Register_2(request):
+    # Redirect if already logged in
+    if request.user.is_authenticated:
+        messages.info(request, 'You are already logged in!')
+        return redirect('home')
+    
     if request.method == 'POST':
         form = UserRegisterForm(request.POST)
         if form.is_valid():
@@ -169,34 +220,209 @@ def Problem_Statement_7(request):
 def Deploy_8(request): 
     if request.method == "POST":
         try:
-            form = forms.UserPredictForm(files=request.FILES)
+            print(f"🔍 DEBUG: POST data received: {request.POST}")
+            form = forms.UserPredictForm(data=request.POST, files=request.FILES)
+            print(f"🔍 DEBUG: Form created with data: {form.data}")
+            
             if form.is_valid():
+                print(f"🔍 DEBUG: Form is valid. Cleaned data: {form.cleaned_data}")
                 # Save the form but don't commit to database yet
                 obj = form.save(commit=False)
                 # Assign the current user to the prediction
                 obj.user = request.user
+                print(f"🔍 DEBUG: Before save - model_preference: {obj.model_preference}")
                 obj.save()
+                print(f"🔍 DEBUG: After save - model_preference: {obj.model_preference}")
             else:
+                print(f"🔍 DEBUG: Form is invalid. Errors: {form.errors}")
                 obj = form.instance
 
             result1 = UserPredictModel.objects.filter(user=request.user).latest('id')
             from django.conf import settings
-            model_path = os.path.join(settings.BASE_DIR, "models", "CNN_skin-cancer.h5")
-            models = keras.models.load_model(model_path, compile=False)
-            data = np.ndarray(shape=(1, 48, 48, 3), dtype=np.float32)
+            
+            # Get user's model preference
+            user_preference = result1.model_preference
+            print(f"🔍 DEBUG: User selected model preference: {user_preference}")
+            print(f"🔍 DEBUG: POST data: {request.POST}")
+            print(f"🔍 DEBUG: Form data saved: model_preference = {result1.model_preference}")
+            
+            # Load both models
+            # Primary Model: EfficientNetB0 (trained on 25,331 images)
+            primary_model_path = os.path.join(settings.BASE_DIR, "models", "EfficientNetB0_skin-cancer.h5")
+            # Secondary Model: Original CNN (trained on 3,297 images)  
+            secondary_model_path = os.path.join(settings.BASE_DIR, "models", "CNN_skin-cancer.h5")
+            
             image_path = os.path.join(settings.MEDIA_ROOT, str(result1))
             image = Image.open(image_path).convert("RGB")
-            size = (48, 48)
-            image = ImageOps.fit(image, size, Image.Resampling.LANCZOS)
-            image_array = np.asarray(image)
-            normalized_image_array = (image_array.astype(np.float32) / 255.0)
-            data[0] = normalized_image_array
-            classes = ['Actinic keratoses','Basal cell carcinoma','Benign keratosis like lesions','Dermatofibroma','Melanoma','Melanocytic nevi','Vascular lesions',"not_skin_cancer"]
-            prediction = models.predict(data)
-            idd = np.argmax(prediction)
-            a = (classes[idd])
+            
+            # Model selection based on user preference
+            model_used = ""
+            confidence = 0.0
+            
+            if user_preference == 'cnn':
+                # Force use CNN model
+                print("🎯 User selected: CNN Model (Forced)")
+                try:
+                    secondary_model = keras.models.load_model(secondary_model_path, compile=False)
+                    
+                    # Prepare image for CNN (48x48)
+                    size = (48, 48)
+                    image_resized = ImageOps.fit(image, size, Image.Resampling.LANCZOS)
+                    image_array = np.asarray(image_resized)
+                    normalized_image_array = (image_array.astype(np.float32) / 255.0)
+                    data_secondary = np.ndarray(shape=(1, 48, 48, 3), dtype=np.float32)
+                    data_secondary[0] = normalized_image_array
+                    
+                    # Original class names (7 classes + not_skin_cancer)
+                    classes_secondary = ['Actinic keratoses','Basal cell carcinoma','Benign keratosis like lesions','Dermatofibroma','Melanoma','Melanocytic nevi','Vascular lesions',"not_skin_cancer"]
+                    
+                    prediction_secondary = secondary_model.predict(data_secondary)
+                    confidence = np.max(prediction_secondary)
+                    secondary_idx = np.argmax(prediction_secondary)
+                    a = classes_secondary[secondary_idx]
+                    model_used = "CNN (User Selected)"
+                    
+                    print(f"CNN Model Result: {a} (Confidence: {confidence:.3f})")
+                    
+                except Exception as e:
+                    print(f"CNN model failed: {e}")
+                    a = "Error loading CNN model"
+                    model_used = "Error"
+                    
+            elif user_preference == 'efficientnet':
+                # Force use EfficientNetB0 model
+                print("🎯 User selected: EfficientNetB0 Model (Forced)")
+                try:
+                    if os.path.exists(primary_model_path):
+                        primary_model = keras.models.load_model(primary_model_path, compile=False)
+                        
+                        # Prepare image for EfficientNetB0 (224x224)
+                        size = (224, 224)
+                        image_resized = ImageOps.fit(image, size, Image.Resampling.LANCZOS)
+                        image_array = np.asarray(image_resized)
+                        normalized_image_array = (image_array.astype(np.float32) / 255.0)
+                        data_primary = np.expand_dims(normalized_image_array, axis=0)
+                        
+                        # Updated class names for new model (8 classes)
+                        classes = ['AK', 'BCC', 'BKL', 'DF', 'MEL', 'NV', 'SCC', 'VASC']
+                        class_names_full = [
+                            'Actinic keratoses', 'Basal cell carcinoma', 'Benign keratosis like lesions',
+                            'Dermatofibroma', 'Melanoma', 'Melanocytic nevi', 'Squamous cell carcinoma', 'Vascular lesions'
+                        ]
+                        
+                        prediction_primary = primary_model.predict(data_primary)
+                        confidence = np.max(prediction_primary)
+                        primary_idx = np.argmax(prediction_primary)
+                        a = class_names_full[primary_idx]
+                        model_used = "EfficientNetB0 (User Selected)"
+                        
+                        print(f"EfficientNetB0 Model Result: {a} (Confidence: {confidence:.3f})")
+                    else:
+                        raise Exception("EfficientNetB0 model not found")
+                        
+                except Exception as e:
+                    print(f"EfficientNetB0 model failed: {e}")
+                    a = "Error loading EfficientNetB0 model"
+                    model_used = "Error"
+                    
+            else:
+                # Auto mode (default intelligent selection)
+                print("🎯 Auto Mode: Intelligent Model Selection")
+                try:
+                    if os.path.exists(primary_model_path):
+                        print("Using Primary Model: EfficientNetB0 (25,331 images)")
+                        # Load EfficientNetB0 with custom handling for compatibility issues
+                        import tensorflow as tf
+                        try:
+                            primary_model = keras.models.load_model(primary_model_path, compile=False)
+                        except Exception as load_error:
+                            print(f"Primary model load error: {load_error}")
+                            # Try with custom object scope
+                            try:
+                                with tf.keras.utils.custom_object_scope({}):
+                                    primary_model = keras.models.load_model(primary_model_path, compile=False, custom_objects={'Cast': tf.cast})
+                            except Exception as custom_error:
+                                print(f"Custom load also failed: {custom_error}")
+                                raise Exception("Could not load primary model")
+                        
+                        # Prepare image for EfficientNetB0 (224x224)
+                        size = (224, 224)
+                        image_resized = ImageOps.fit(image, size, Image.Resampling.LANCZOS)
+                        image_array = np.asarray(image_resized)
+                        normalized_image_array = (image_array.astype(np.float32) / 255.0)
+                        data_primary = np.expand_dims(normalized_image_array, axis=0)
+                        
+                        # Updated class names for new model (8 classes)
+                        classes = ['AK', 'BCC', 'BKL', 'DF', 'MEL', 'NV', 'SCC', 'VASC']
+                        class_names_full = [
+                            'Actinic keratoses', 'Basal cell carcinoma', 'Benign keratosis like lesions',
+                            'Dermatofibroma', 'Melanoma', 'Melanocytic nevi', 'Squamous cell carcinoma', 'Vascular lesions'
+                        ]
+                        
+                        prediction_primary = primary_model.predict(data_primary)
+                        primary_confidence = np.max(prediction_primary)
+                        primary_idx = np.argmax(prediction_primary)
+                        primary_result = class_names_full[primary_idx]
+                        
+                        print(f"Primary Model Prediction: {primary_result} (Confidence: {primary_confidence:.3f})")
+                        
+                        # Use primary model result if confidence is high enough
+                        if primary_confidence > 0.5:  # Threshold for primary model
+                            a = primary_result
+                            model_used = "EfficientNetB0 (Primary)"
+                            confidence = primary_confidence
+                        else:
+                            raise Exception("Low confidence, falling back to secondary model")
+                            
+                    else:
+                        raise Exception("Primary model not found")
+                        
+                except Exception as e:
+                    print(f"Primary model failed: {str(e)}, using secondary model")
+                    
+                    # Fallback to secondary model (Original CNN)
+                    print("Using Secondary Model: CNN (3,297 images)")
+                    secondary_model = keras.models.load_model(secondary_model_path, compile=False)
+                    
+                    # Prepare image for CNN (48x48)
+                    size = (48, 48)
+                    image_resized = ImageOps.fit(image, size, Image.Resampling.LANCZOS)
+                    image_array = np.asarray(image_resized)
+                    normalized_image_array = (image_array.astype(np.float32) / 255.0)
+                    data_secondary = np.ndarray(shape=(1, 48, 48, 3), dtype=np.float32)
+                    data_secondary[0] = normalized_image_array
+                    
+                    # Original class names (7 classes + not_skin_cancer)
+                    classes_secondary = ['Actinic keratoses','Basal cell carcinoma','Benign keratosis like lesions','Dermatofibroma','Melanoma','Melanocytic nevi','Vascular lesions',"not_skin_cancer"]
+                    
+                    prediction_secondary = secondary_model.predict(data_secondary)
+                    secondary_confidence = np.max(prediction_secondary)
+                    secondary_idx = np.argmax(prediction_secondary)
+                    a = classes_secondary[secondary_idx]
+                    model_used = "CNN (Secondary)"
+                    confidence = secondary_confidence
+                    
+                    print(f"Secondary Model Prediction: {a} (Confidence: {confidence:.3f})")
+            
+            print(f"Final Prediction: {a} using {model_used} (Confidence: {confidence:.3f})")
             print("output_class_name+++++++++++++++++",a)
-            if a.lower() == 'actinic keratoses':
+            
+            # Import the legal-compliant result formatter
+            from .result_formatter import format_legal_result, format_html_result
+            
+            # Store original prediction for database
+            original_prediction = a
+            
+            # Generate legally-compliant result
+            legal_result = format_legal_result(original_prediction, confidence, model_used)
+            
+            # Use legal result for display
+            a = legal_result['educational_description']
+            b = legal_result['prevention_info'] 
+            c = legal_result['precautions']
+            
+            # Legacy condition handling (keeping for compatibility)
+            if original_prediction.lower() == 'actinic keratoses':
                 a =  'Actinic keratosis is a common precancerous skin condition often caused by sun exposure.'
                 b =  'Preventions: Protect your skin from the sun by wearing protective clothing and applying sunscreen. Avoid prolonged sun exposure, especially during peak hours. Perform regular skin checks and seek medical attention for any suspicious lesions.'
                 c = 'Precautions: Limit sun exposure, especially during midday hours. Use sunscreen with SPF regularly. Wear protective clothing and accessories like hats and sunglasses when outdoors. Avoid tanning beds and sunlamps.'
@@ -227,20 +453,42 @@ def Deploy_8(request):
             elif a.lower() in ['vascular lesions', 'vascular lesion']:
                 a = 'A vascular lesion is an abnormal cluster of blood vessels that can cause red or purple marks on the skin.'
                 b = 'Preventions: Preventing vascular lesions may not always be possible, but protecting your skin from injury and maintaining good skin health may help.'
-                c = 'Precautions: Keep an eye on any unusual marks on your skin. Protect your skin from injuries and excessive sun exposure. If you notice anything concerning, consult a dermatologist.'                
+                c = 'Precautions: Keep an eye on any unusual marks on your skin. Protect your skin from injuries and excessive sun exposure. If you notice anything concerning, consult a dermatologist.'
+            elif a.lower() in ['squamous cell carcinoma', 'scc']:
+                a = 'Squamous cell carcinoma is a common type of skin cancer that develops in the squamous cells of the outer layer of skin.'
+                b = 'Preventions: Protect your skin from UV radiation by wearing sunscreen, protective clothing, and seeking shade. Avoid tanning beds and excessive sun exposure. Regular skin examinations can help detect early signs.'
+                c = 'Precautions: Limit sun exposure, especially during peak hours. Use broad-spectrum sunscreen with high SPF. Wear protective clothing and accessories. Avoid tanning beds. Monitor your skin for any new or changing lesions and consult a dermatologist promptly.'
             else:
-                a = 'WRONG INPUT'
-                b = 'Unable to classify'
-                c = 'Please try again'
+                a = 'Image may not be suitable for reliable analysis'
+                b = 'The image quality or content may not be optimal for our AI analysis system'
+                c = 'Consider uploading a clearer, well-lit image of the skin area for better results'
 
-            data = UserPredictModel.objects.latest('id')
-            data.label = a
-            data.save()
+            # Update the specific record we just created
+            result1.label = original_prediction  # Store the actual AI prediction, not the educational description
+            result1.model_used = model_used
+            result1.confidence_score = confidence
+            result1.save()
             
-            # Send email notification if enabled
-            send_prediction_notification(request.user, a, str(result1))
+            print(f"Final Prediction: {a} using {model_used} (Confidence: {confidence:.3f})")
             
-            return render(request, '8_Deploy.html',{'form':form,'obj':obj,'predict':a, 'c':c,'b':b})
+            # Send email notification only for first analysis (to preserve email quota)
+            send_smart_analysis_notification(request.user, a, str(result1))
+            
+            # Store results in session for the results page (convert numpy types to Python types)
+            request.session['analysis_results'] = {
+                'prediction_id': result1.id,
+                'predict': a,
+                'c': c,
+                'b': b,
+                'legal_result': convert_numpy_types(legal_result),
+                'model_used': model_used,
+                'confidence': float(confidence) if confidence is not None else None,
+                'user_preference': user_preference,
+                'original_prediction': original_prediction
+            }
+            
+            # Redirect to dedicated results page
+            return redirect('analysis_results')
         except Exception as e:
             print(f"Error in prediction: {str(e)}")
             messages.error(request, f'Error processing image: {str(e)}')
@@ -250,6 +498,50 @@ def Deploy_8(request):
         form = forms.UserPredictForm()
     return render(request, '8_Deploy.html',{'form':form})
 
+
+@login_required(login_url='login')
+def analysis_results(request):
+    """Dedicated results page for analysis output"""
+    
+    # Get results from session
+    results_data = request.session.get('analysis_results')
+    if not results_data:
+        messages.error(request, 'No analysis results found. Please run a new analysis.')
+        return redirect('analyze')
+    
+    # Get the prediction object
+    try:
+        obj = UserPredictModel.objects.get(id=results_data['prediction_id'], user=request.user)
+    except UserPredictModel.DoesNotExist:
+        messages.error(request, 'Analysis results not found.')
+        return redirect('analyze')
+    
+    # Import the result formatter for HTML generation
+    from .result_formatter import format_html_result
+    
+    # Generate formatted HTML if legal_result exists
+    formatted_html = None
+    if results_data.get('legal_result'):
+        formatted_html = format_html_result(results_data['legal_result'])
+    
+    context = {
+        'obj': obj,
+        'predict': results_data.get('predict'),
+        'c': results_data.get('c'),
+        'b': results_data.get('b'),
+        'legal_result': results_data.get('legal_result'),
+        'formatted_html': formatted_html,
+        'model_used': results_data.get('model_used'),
+        'confidence': results_data.get('confidence'),
+        'user_preference': results_data.get('user_preference'),
+        'original_prediction': results_data.get('original_prediction')
+    }
+    
+    # Clear the session data after use
+    if 'analysis_results' in request.session:
+        del request.session['analysis_results']
+    
+    return render(request, 'analysis_results.html', context)
 
 @login_required(login_url='login')
 def Out_Database_9(request):
@@ -337,10 +629,10 @@ def patientResult(request):
             b = 'Preventions: Preventing vascular lesions may not always be possible, but protecting your skin from injury and maintaining good skin health may help.'
             c = 'Precautions: Keep an eye on any unusual marks on your skin. Protect your skin from injuries and excessive sun exposure. If you notice anything concerning, consult a dermatologist.'                
         else:
-            classes = 'WRONG INPUT'
-            a = 'Unable to classify the image'
-            b = 'Please upload a clear image of a skin lesion'
-            c = 'Ensure the image is well-lit and focused'
+            classes = 'Image may need adjustment'
+            a = 'The image may not be optimal for analysis'
+            b = 'Consider uploading a clearer, well-lit image of the skin area'
+            c = 'Ensure the image shows the skin area clearly with good lighting'
 
         return render(request,"charts.html",{'chartDetails':  output,'label':label_json,'preditionImage':filename,"report":classes,"a":a,"b":b,"c":c})
     except Exception as e:
@@ -803,6 +1095,64 @@ def DermaGenieChat(request):
     return JsonResponse({'success': False, 'message': 'Invalid request method.'})
 
 
+@login_required(login_url='login')
+def DermaGenieWidgetChat(request):
+    """API endpoint for DermaGenie widget chat (simplified responses)"""
+    from django.http import JsonResponse
+    from .ai_assistant import get_dermagenie_response
+    import json
+    
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            user_message = data.get('message', '').strip()
+            
+            if not user_message:
+                return JsonResponse({
+                    'success': False,
+                    'response': 'Please enter a message.'
+                })
+            
+            # Add context for skin-specific questions
+            context_message = f"""You are DermaGenie AI, a helpful skin health assistant. 
+            Keep responses concise (2-3 sentences) for the chat widget.
+            Focus on skin health, dermatology, and skin cancer information.
+            
+            User question: {user_message}"""
+            
+            # Get AI response
+            response = get_dermagenie_response(context_message)
+            
+            if response['success']:
+                # Extract plain text from formatted HTML
+                import re
+                plain_text = re.sub('<[^<]+?>', '', response['formatted_html'])
+                plain_text = plain_text.replace('&nbsp;', ' ').strip()
+                
+                return JsonResponse({
+                    'success': True,
+                    'response': plain_text
+                })
+            else:
+                return JsonResponse({
+                    'success': False,
+                    'response': 'Sorry, I encountered an error. Please try again or visit the full DermaGenie page for more detailed assistance.'
+                })
+                
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'response': f'Sorry, I\'m having trouble right now. Please try again later.'
+            })
+    
+    return JsonResponse({'success': False, 'response': 'Invalid request method.'})
+
+
+def TermsAndConditions(request):
+    """Terms & Conditions page"""
+    return render(request, 'terms_and_conditions.html')
+
+
 def Logout(request):
     logout(request)
     messages.success(request, 'You have been logged out successfully.')
@@ -813,6 +1163,11 @@ def Logout(request):
 # Email Verification Views
 def verify_email(request):
     """View for entering OTP to verify email"""
+    # Redirect if already logged in
+    if request.user.is_authenticated:
+        messages.info(request, 'You are already logged in and verified!')
+        return redirect('home')
+    
     # Get user ID from session
     user_id = request.session.get('verify_user_id')
     
@@ -854,6 +1209,11 @@ def verify_email(request):
 
 def resend_otp_view(request):
     """View to resend OTP"""
+    # Redirect if already logged in
+    if request.user.is_authenticated:
+        messages.info(request, 'You are already logged in and verified!')
+        return redirect('home')
+    
     user_id = request.session.get('verify_user_id')
     
     if not user_id:
@@ -874,3 +1234,164 @@ def resend_otp_view(request):
         return redirect('register')
     
     return redirect('verify_email')
+
+
+# Password Reset Views
+def forgot_password(request):
+    """View for requesting password reset"""
+    # Redirect if already logged in
+    if request.user.is_authenticated:
+        messages.info(request, 'You are already logged in!')
+        return redirect('home')
+    
+    if request.method == 'POST':
+        email = request.POST.get('email', '').strip()
+        
+        if not email:
+            messages.error(request, 'Please enter your email address.')
+            return render(request, 'forgot_password.html')
+        
+        # Send password reset OTP
+        from .password_reset_utils import send_password_reset_otp
+        success, message, user = send_password_reset_otp(email)
+        
+        if success:
+            messages.success(request, message)
+            # Store user ID in session for password reset
+            request.session['reset_user_id'] = user.id
+            return redirect('verify_reset_otp')
+        else:
+            messages.error(request, message)
+    
+    return render(request, 'forgot_password.html')
+
+
+def verify_reset_otp(request):
+    """View for verifying password reset OTP"""
+    # Redirect if already logged in
+    if request.user.is_authenticated:
+        messages.info(request, 'You are already logged in!')
+        return redirect('home')
+    
+    # Get user ID from session
+    user_id = request.session.get('reset_user_id')
+    
+    if not user_id:
+        messages.error(request, 'No password reset session found. Please request a new code.')
+        return redirect('forgot_password')
+    
+    try:
+        user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        messages.error(request, 'User not found.')
+        return redirect('forgot_password')
+    
+    if request.method == 'POST':
+        entered_otp = request.POST.get('otp', '').strip()
+        
+        if not entered_otp:
+            messages.error(request, 'Please enter the OTP.')
+            return render(request, 'verify_reset_otp.html', {'user': user})
+        
+        # Verify password reset OTP
+        from .password_reset_utils import verify_password_reset_otp
+        success, message = verify_password_reset_otp(user, entered_otp)
+        
+        if success:
+            messages.success(request, message)
+            # Store verification status in session
+            request.session['otp_verified'] = True
+            return redirect('reset_password')
+        else:
+            messages.error(request, message)
+    
+    context = {'user': user}
+    return render(request, 'verify_reset_otp.html', context)
+
+
+def reset_password(request):
+    """View for setting new password after OTP verification"""
+    # Redirect if already logged in
+    if request.user.is_authenticated:
+        messages.info(request, 'You are already logged in!')
+        return redirect('home')
+    
+    # Check if OTP was verified
+    if not request.session.get('otp_verified'):
+        messages.error(request, 'Please verify your OTP first.')
+        return redirect('forgot_password')
+    
+    # Get user ID from session
+    user_id = request.session.get('reset_user_id')
+    
+    if not user_id:
+        messages.error(request, 'Session expired. Please request a new password reset.')
+        return redirect('forgot_password')
+    
+    try:
+        user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        messages.error(request, 'User not found.')
+        return redirect('forgot_password')
+    
+    if request.method == 'POST':
+        new_password = request.POST.get('new_password', '').strip()
+        confirm_password = request.POST.get('confirm_password', '').strip()
+        
+        # Validation
+        if not new_password or not confirm_password:
+            messages.error(request, 'Please fill in all fields.')
+            return render(request, 'reset_password.html', {'user': user})
+        
+        if new_password != confirm_password:
+            messages.error(request, 'Passwords do not match.')
+            return render(request, 'reset_password.html', {'user': user})
+        
+        if len(new_password) < 8:
+            messages.error(request, 'Password must be at least 8 characters long.')
+            return render(request, 'reset_password.html', {'user': user})
+        
+        # Set new password
+        user.set_password(new_password)
+        user.save()
+        
+        # Clear session
+        if 'reset_user_id' in request.session:
+            del request.session['reset_user_id']
+        if 'otp_verified' in request.session:
+            del request.session['otp_verified']
+        
+        messages.success(request, 'Password reset successfully! You can now login with your new password.')
+        return redirect('login')
+    
+    context = {'user': user}
+    return render(request, 'reset_password.html', context)
+
+
+def resend_reset_otp(request):
+    """View to resend password reset OTP"""
+    # Redirect if already logged in
+    if request.user.is_authenticated:
+        messages.info(request, 'You are already logged in!')
+        return redirect('home')
+    
+    user_id = request.session.get('reset_user_id')
+    
+    if not user_id:
+        messages.error(request, 'No password reset session found.')
+        return redirect('forgot_password')
+    
+    try:
+        user = User.objects.get(id=user_id)
+        from .password_reset_utils import send_password_reset_otp
+        success, message, _ = send_password_reset_otp(user.email)
+        
+        if success:
+            messages.success(request, 'Password reset code resent successfully! Please check your email.')
+        else:
+            messages.error(request, message)
+    except User.DoesNotExist:
+        messages.error(request, 'User not found.')
+        return redirect('forgot_password')
+    
+    return redirect('verify_reset_otp')

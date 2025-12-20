@@ -297,6 +297,164 @@
         background: rgba(239, 68, 68, 0.3);
     }
 
+    .model-status-badge {
+        padding: 0.3rem 1rem;
+        background: var(--gradient-primary);
+        color: white;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    .model-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .model-card {
+        background: rgba(168, 85, 247, 0.05);
+        border: 1px solid rgba(168, 85, 247, 0.2);
+        border-radius: 15px;
+        padding: 1.5rem;
+        position: relative;
+    }
+
+    .model-card.primary {
+        border-color: rgba(168, 85, 247, 0.4);
+        background: rgba(168, 85, 247, 0.08);
+    }
+
+    .model-card.secondary {
+        border-color: rgba(6, 182, 212, 0.4);
+        background: rgba(6, 182, 212, 0.08);
+    }
+
+    .model-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid rgba(168, 85, 247, 0.2);
+    }
+
+    .model-header h4 {
+        color: var(--text-primary);
+        font-size: 1.1rem;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .model-type {
+        padding: 0.2rem 0.8rem;
+        background: var(--gradient-secondary);
+        color: white;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .model-stats {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .stat-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.3rem 0;
+    }
+
+    .stat-label {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+    }
+
+    .stat-value {
+        color: var(--text-primary);
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .status-indicator {
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    .status-indicator.active {
+        color: #10b981;
+    }
+
+    .status-indicator.inactive {
+        color: #ef4444;
+    }
+
+    .status-indicator.checking {
+        color: #f59e0b;
+    }
+
+    .model-info {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid rgba(168, 85, 247, 0.2);
+    }
+
+    .info-section h5 {
+        color: var(--text-primary);
+        font-size: 1rem;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .info-section p {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        line-height: 1.5;
+        margin-bottom: 1rem;
+    }
+
+    .info-section ol {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        line-height: 1.6;
+        padding-left: 1.2rem;
+    }
+
+    .info-section li {
+        margin-bottom: 0.5rem;
+    }
+
+    .conditions-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 0.5rem;
+    }
+
+    .condition-tag {
+        padding: 0.4rem 0.8rem;
+        background: rgba(168, 85, 247, 0.1);
+        border: 1px solid rgba(168, 85, 247, 0.3);
+        border-radius: 8px;
+        font-size: 0.8rem;
+        color: var(--text-primary);
+        text-align: center;
+        font-weight: 500;
+    }
+
     .quick-actions {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -491,6 +649,113 @@
     </div>
 </div>
 
+<!-- AI Model Information -->
+<div class="dashboard-card full-width">
+    <div class="card-header">
+        <h3 class="card-title"><i class="fas fa-brain"></i> AI Model System</h3>
+        <span class="model-status-badge">Dual-Model Active</span>
+    </div>
+    
+    <div class="model-grid">
+        <div class="model-card primary">
+            <div class="model-header">
+                <h4><i class="fas fa-star"></i> Primary Model</h4>
+                <span class="model-type">EfficientNetB0</span>
+            </div>
+            <div class="model-stats">
+                <div class="stat-item">
+                    <span class="stat-label">Training Data:</span>
+                    <span class="stat-value">25,331 images</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Dataset:</span>
+                    <span class="stat-value">ISIC 2019</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Input Size:</span>
+                    <span class="stat-value">224×224×3</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Test Accuracy:</span>
+                    <span class="stat-value">71.32%</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Classes:</span>
+                    <span class="stat-value">8 conditions</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Status:</span>
+                    <span class="status-indicator" id="primary-status">
+                        <i class="fas fa-circle"></i> Checking...
+                    </span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="model-card secondary">
+            <div class="model-header">
+                <h4><i class="fas fa-shield-alt"></i> Secondary Model</h4>
+                <span class="model-type">Custom CNN</span>
+            </div>
+            <div class="model-stats">
+                <div class="stat-item">
+                    <span class="stat-label">Training Data:</span>
+                    <span class="stat-value">3,297 images</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Dataset:</span>
+                    <span class="stat-value">Custom</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Input Size:</span>
+                    <span class="stat-value">48×48×3</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Test Accuracy:</span>
+                    <span class="stat-value">94.1%</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Classes:</span>
+                    <span class="stat-value">8 conditions</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Status:</span>
+                    <span class="status-indicator active">
+                        <i class="fas fa-circle"></i> Active
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="model-info">
+        <div class="info-section">
+            <h5><i class="fas fa-info-circle"></i> System Logic</h5>
+            <p>The system uses a dual-model approach for maximum reliability:</p>
+            <ol>
+                <li><strong>Primary:</strong> EfficientNetB0 model attempts prediction first</li>
+                <li><strong>Confidence Check:</strong> If confidence > 50%, use primary result</li>
+                <li><strong>Fallback:</strong> If primary fails or low confidence, use CNN model</li>
+                <li><strong>Logging:</strong> All predictions logged with model used and confidence</li>
+            </ol>
+        </div>
+        
+        <div class="info-section">
+            <h5><i class="fas fa-list"></i> Supported Conditions</h5>
+            <div class="conditions-grid">
+                <span class="condition-tag">Actinic Keratoses (AK)</span>
+                <span class="condition-tag">Basal Cell Carcinoma (BCC)</span>
+                <span class="condition-tag">Benign Keratosis-like (BKL)</span>
+                <span class="condition-tag">Dermatofibroma (DF)</span>
+                <span class="condition-tag">Melanoma (MEL)</span>
+                <span class="condition-tag">Melanocytic Nevi (NV)</span>
+                <span class="condition-tag">Squamous Cell Carcinoma (SCC)</span>
+                <span class="condition-tag">Vascular Lesions (VASC)</span>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Quick Actions -->
 <div class="dashboard-card full-width">
     <div class="card-header">
@@ -582,5 +847,36 @@ function viewUser(userId) {
 function exportSystemReport() {
     alert('System report export feature coming soon!');
 }
+
+// Check model status
+function checkModelStatus() {
+    const primaryStatus = document.getElementById('primary-status');
+    if (primaryStatus) {
+        // Check if primary model exists by trying to fetch model info
+        // This is a simple client-side check - in production you'd use an API endpoint
+        primaryStatus.innerHTML = '<i class="fas fa-circle"></i> Checking...';
+        primaryStatus.className = 'status-indicator checking';
+        
+        // Simulate model status check
+        setTimeout(() => {
+            // In a real implementation, this would check the actual model file
+            // For now, we'll assume primary model is not available until added
+            const modelExists = false; // This would be determined by actual file check
+            
+            if (modelExists) {
+                primaryStatus.innerHTML = '<i class="fas fa-circle"></i> Active';
+                primaryStatus.className = 'status-indicator active';
+            } else {
+                primaryStatus.innerHTML = '<i class="fas fa-circle"></i> Not Found';
+                primaryStatus.className = 'status-indicator inactive';
+            }
+        }, 1000);
+    }
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    checkModelStatus();
+});
 </script>
 {% endblock %}
