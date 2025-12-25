@@ -653,9 +653,24 @@
     display: none !important;
 }
 
+/* Allow active mobile menu to show even with mobile-only class */
+.mobile-only.active,
+#mobileNavMenu.active,
+body.mobile-nav-open .mobile-only {
+    display: block !important;
+}
+
 @media (max-width: 768px) {
     .mobile-only {
         display: block !important;
+    }
+    
+    /* Ensure active state works on mobile */
+    .mobile-only.active,
+    #mobileNavMenu.active {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
     }
     
     .mobile-hidden {

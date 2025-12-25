@@ -20,10 +20,13 @@
     <link rel="stylesheet" href="{% static 'css/tooltips.css' %}">
     
     <!-- DermaGenie Widget CSS -->
-    <link rel="stylesheet" href="{% static 'css/dermagenie-widget.css">
+    <link rel="stylesheet" href="{% static 'css/dermagenie-widget.css' %}">
     
-    <!-- Mobile Navigation CSS -->
-    <link rel="stylesheet" href="{% static 'css/mobile-navigation.css' %}' %}">
+    <!-- Mobile Navigation CSS - Cache busted v8 -->
+    <link rel="stylesheet" href="{% static 'css/mobile-navigation.css' %}?v=8">
+    
+    <!-- Mobile Responsiveness CSS - Cache busted v2 -->
+    <link rel="stylesheet" href="{% static 'css/mobile-responsive.css' %}?v=2">
 
     <style>
         /* ========================================
@@ -527,7 +530,7 @@
         }
 
         /* ========================================
-           📱 RESPONSIVE DESIGN - COMPREHENSIVE
+           📱 COMPREHENSIVE MOBILE RESPOHENSIVE
            ======================================== */
 
         /* Mobile First - Base styles for mobile */
@@ -569,70 +572,10 @@
             }
         }
 
-        /* Mobile specific - 767px and below */
-        @media (max-width: 767px) {
-            .nav-links {
-                display: none;
-            }
-
-            .navbar {
-                padding: 0.75rem 1rem;
-            }
-
-            .logo {
-                font-size: 1.2rem;
-            }
-
-            .btn {
-                padding: 0.6rem 1.2rem;
-                font-size: 0.9rem;
-            }
-
-            h1 {
-                font-size: 2rem !important;
-            }
-
-            h2 {
-                font-size: 1.5rem !important;
-            }
-
-            h3 {
-                font-size: 1.25rem !important;
-            }
-
-            .card {
-                padding: 1.5rem;
-                margin-bottom: 1.5rem;
-            }
-        }
-
-        /* Small mobile - 480px and below */
-        @media (max-width: 480px) {
-            .container {
-                padding: 4.5rem 0.75rem 1rem;
-            }
-
-            .logo {
-                font-size: 1rem;
-            }
-
-            h1 {
-                font-size: 1.75rem !important;
-            }
-
-            h2 {
-                font-size: 1.25rem !important;
-            }
-
-            .card {
-                padding: 1rem;
-            }
-
-            .btn {
-                padding: 0.5rem 1rem;
-                font-size: 0.85rem;
-            }
-        }
+        /* ========================================
+           📱 MOBILE NAVIGATION - HANDLED BY EXTERNAL CSS
+           ======================================== */
+        /* All mobile navigation styles are in mobile-navigation.css */
 
         /* ========================================
            ✨ SCROLL ANIMATIONS - DISABLED FOR PERFORMANCE
@@ -684,8 +627,8 @@
             display: block;
         }
 
-
     </style>
+    
     {% block extra_css %}{% endblock %}
 </head>
 
@@ -698,11 +641,54 @@
                 <span>SKINCARE AI</span>
             </a>
             
-            <!-- Mobile Navigation Toggle -->
+            <!-- Mobile Navigation Toggle - Visible only on mobile -->
             <button class="mobile-nav-toggle" id="mobileNavToggle">
                 <i class="fas fa-bars"></i>
             </button>
-            <ul class="nav-links">
+            
+            <style>
+                /* Mobile Navigation Toggle - Default hidden, shown on mobile */
+                #mobileNavToggle {
+                    display: none;
+                    background: none;
+                    border: none;
+                    color: #ffffff;
+                    font-size: 1.5rem;
+                    cursor: pointer;
+                    padding: 0.5rem;
+                    border-radius: 8px;
+                    z-index: 1001;
+                    transition: all 0.3s ease;
+                }
+                #mobileNavToggle:hover {
+                    background: rgba(168, 85, 247, 0.1);
+                    color: #a855f7;
+                }
+                /* Force show hamburger on mobile (767px and below) */
+                @media (max-width: 767px) {
+                    #mobileNavToggle {
+                        display: flex !important;
+                        align-items: center;
+                        justify-content: center;
+                        visibility: visible !important;
+                        opacity: 1 !important;
+                    }
+                    .nav-links {
+                        display: none !important;
+                    }
+                }
+                /* Hide on desktop (768px and above) */
+                @media (min-width: 768px) {
+                    #mobileNavToggle {
+                        display: none !important;
+                    }
+                    .nav-links {
+                        display: flex !important;
+                    }
+                }
+            </style>
+            
+            <ul class="nav-links" id="navLinks">
                 {% if user.is_authenticated %}
                 {% if user.is_staff or user.is_superuser %}
                 <!-- Admin Navigation -->
@@ -762,9 +748,65 @@
             </ul>
         </div>
     </nav>
+
     <!-- Mobile Navigation Menu -->
-    <div class="mobile-nav-menu" id="mobileNavMenu">
-        <ul class="nav-links">
+    <div class="mobile-nav-menu mobile-only" id="mobileNavMenu">
+        <style>
+            /* INLINE CRITICAL STYLES - Highest specificity for mobile menu visibility */
+            @media (max-width: 767px) {
+                #mobileNavMenu.active,
+                body.mobile-nav-open #mobileNavMenu {
+                    display: block !important;
+                    visibility: visible !important;
+                    opacity: 1 !important;
+                    transform: translateY(0) !important;
+                    position: fixed !important;
+                    top: 4.5rem !important;
+                    left: 0 !important;
+                    right: 0 !important;
+                    width: 100% !important;
+                    z-index: 999 !important;
+                    pointer-events: auto !important;
+                    background: rgba(10, 10, 15, 0.98) !important;
+                    backdrop-filter: blur(20px) !important;
+                    border-bottom: 1px solid rgba(168, 85, 247, 0.2) !important;
+                    max-height: calc(100vh - 4.5rem) !important;
+                    overflow-y: auto !important;
+                }
+                /* Ensure nav-links inside mobile menu are visible */
+                #mobileNavMenu .nav-links,
+                #mobileNavMenu .mobile-nav-links,
+                #mobileNavMenu ul {
+                    display: flex !important;
+                    flex-direction: column !important;
+                    visibility: visible !important;
+                    opacity: 1 !important;
+                    padding: 1rem !important;
+                    margin: 0 !important;
+                    list-style: none !important;
+                }
+                #mobileNavMenu li {
+                    display: block !important;
+                    visibility: visible !important;
+                    opacity: 1 !important;
+                    width: 100% !important;
+                    margin-bottom: 0.5rem !important;
+                }
+                #mobileNavMenu a {
+                    display: flex !important;
+                    visibility: visible !important;
+                    opacity: 1 !important;
+                    padding: 1rem 1.25rem !important;
+                    color: #e2e8f0 !important;
+                    background: rgba(26, 26, 36, 0.6) !important;
+                    border-radius: 12px !important;
+                    text-decoration: none !important;
+                    align-items: center !important;
+                    gap: 0.75rem !important;
+                }
+            }
+        </style>
+        <ul class="nav-links mobile-nav-links">
             {% if user.is_authenticated %}
             {% if user.is_staff or user.is_superuser %}
             <!-- Admin Mobile Navigation -->
@@ -775,16 +817,28 @@
             <li><a href="{% url 'home' %}"><i class="fas fa-home"></i> Dashboard</a></li>
             <li><a href="{% url 'analyze' %}"><i class="fas fa-microscope"></i> Analyze</a></li>
             <li><a href="{% url 'history' %}"><i class="fas fa-database"></i> History</a></li>
-            <li><a href="{% url 'dermagenie' %}"><i class="fas fa-magic"></i> DermaGenie AI</a></li>
-            <li><a href="{% url 'analytics' %}"><i class="fas fa-chart-line"></i> Analytics</a></li>
-            <li><a href="{% url 'compare' %}"><i class="fas fa-balance-scale"></i> Compare</a></li>
+            
+            <!-- Tools Section -->
+            <li style="padding: 0.5rem 1rem; color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid rgba(168, 85, 247, 0.1); margin-bottom: 0.5rem;">
+                <i class="fas fa-tools"></i> Tools
+            </li>
+            <li><a href="{% url 'dermagenie' %}" style="padding-left: 2rem;"><i class="fas fa-magic"></i> DermaGenie AI</a></li>
+            <li><a href="{% url 'analytics' %}" style="padding-left: 2rem;"><i class="fas fa-chart-line"></i> Analytics</a></li>
+            <li><a href="{% url 'compare' %}" style="padding-left: 2rem;"><i class="fas fa-balance-scale"></i> Compare</a></li>
+            
             <li><a href="{% url 'about' %}"><i class="fas fa-users"></i> About</a></li>
-            <li><a href="{% url 'profile' %}"><i class="fas fa-user-edit"></i> Profile</a></li>
-            <li><a href="{% url 'logout' %}" style="color: #ef4444;"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            
+            <!-- User Section -->
+            <li style="padding: 0.5rem 1rem; color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid rgba(168, 85, 247, 0.1); margin: 1rem 0 0.5rem 0;">
+                <i class="fas fa-user-circle"></i> {{ user.username }}
+            </li>
+            <li><a href="{% url 'profile' %}" style="padding-left: 2rem;"><i class="fas fa-user-edit"></i> Profile</a></li>
+            <li><a href="{% url 'logout' %}" style="color: #ef4444; padding-left: 2rem;"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
             {% endif %}
             {% else %}
-            <li><a href="{% url 'login' %}" class="btn btn-outline btn-inline">Login</a></li>
-            <li><a href="{% url 'register' %}" class="btn btn-primary btn-inline">Register</a></li>
+            <!-- Guest Mobile Navigation -->
+            <li><a href="{% url 'login' %}"><i class="fas fa-sign-in-alt"></i> Login</a></li>
+            <li><a href="{% url 'register' %}"><i class="fas fa-user-plus"></i> Register</a></li>
             {% endif %}
         </ul>
     </div>
@@ -943,19 +997,21 @@
     <!-- Main Content -->
     <main>
 
-        <!-- Dropdown Menu Script -->
+        <!-- Navigation Scripts -->
         <script>
-            // Improve dropdown stability
             document.addEventListener('DOMContentLoaded', function () {
+                // Mobile Navigation is handled by external js/mobile-navigation.js
+                // DO NOT add mobile navigation code here - it causes double-click issues!
+                
+                // Desktop Dropdown Menu Stability
                 const dropdowns = document.querySelectorAll('.dropdown');
-
                 dropdowns.forEach(dropdown => {
                     let timeout;
 
                     dropdown.addEventListener('mouseenter', function () {
                         clearTimeout(timeout);
                         const menu = this.querySelector('.dropdown-menu');
-                        if (menu) {
+                        if (menu && window.innerWidth > 768) {
                             menu.style.opacity = '1';
                             menu.style.visibility = 'visible';
                             menu.style.transform = 'translateY(0)';
@@ -965,16 +1021,19 @@
                     dropdown.addEventListener('mouseleave', function () {
                         const menu = this.querySelector('.dropdown-menu');
                         timeout = setTimeout(() => {
-                            if (menu) {
+                            if (menu && window.innerWidth > 768) {
                                 menu.style.opacity = '0';
                                 menu.style.visibility = 'hidden';
                                 menu.style.transform = 'translateY(-10px)';
                             }
-                        }, 100); // Small delay before closing
+                        }, 100);
                     });
                 });
             });
         </script>
+
+        <!-- Mobile Navigation is handled by external js/mobile-navigation.js -->
+
         {% block content %}{% endblock %}
     </main>
 
@@ -1036,16 +1095,12 @@
     <script src="{% static 'js/tooltips.js' %}"></script>
     
     <!-- DermaGenie Widget JavaScript -->
-    <script src="{% static 'js/dermagenie-widget.js">
+    <script src="{% static 'js/dermagenie-widget.js' %}"></script>
     
-    <!-- Mobile Navigation JavaScript -->
-    <script src="{% static 'js/mobile-navigation.js' %}' %}"></script>
+    <!-- Mobile Navigation JavaScript - Cache busted v8 -->
+    <script src="{% static 'js/mobile-navigation.js' %}?v=8"></script>
 
     {% block extra_js %}{% endblock %}
 </body>
 
 </html>
-
-
-
-
