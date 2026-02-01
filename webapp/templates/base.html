@@ -412,13 +412,13 @@
             margin: 0 auto;
             padding: 6rem 2rem 2rem;
             position: relative;
-            z-index: 1;
+            z-index: 1; /* Ensure content appears above video background */
         }
 
         .card {
-            background: rgba(26, 26, 36, 0.8) !important;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(168, 85, 247, 0.2);
+            background: rgba(26, 26, 36, 0.9) !important; /* Increased opacity for better visibility over video */
+            backdrop-filter: blur(15px); /* Increased blur for premium effect */
+            border: 1px solid rgba(168, 85, 247, 0.3); /* Slightly more visible border */
             border-radius: 16px;
             padding: 2rem;
             margin-bottom: 2rem;
@@ -427,6 +427,7 @@
             position: relative;
             overflow: hidden;
             animation: cardFadeIn 0.5s ease-out backwards;
+            z-index: 2; /* Ensure cards appear above video background */
         }
 
         @keyframes cardFadeIn {

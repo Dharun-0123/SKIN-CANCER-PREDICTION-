@@ -10,6 +10,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- Floating Video Background CSS - Landing Page Only -->
+    <link rel="stylesheet" href="{% static 'css/floating-video-background.css' %}">
+    
     <style>
         * {
             margin: 0;
@@ -31,7 +34,7 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            background: var(--bg-primary);
+            background: transparent; /* Transparent for video background */
             color: var(--text-primary);
             overflow-x: hidden;
         }
@@ -409,11 +412,26 @@
                 flex-direction: column;
             }
         }
+        
+        /* TEMPORARY: Make video fully visible for debugging */
+        .video-background video {
+            opacity: 1.0 !important;
+            filter: none !important;
+            z-index: -1 !important;
+        }
     </style>
 </head>
 <body>
-    <!-- Animated Particles Background - DISABLED FOR PERFORMANCE -->
-    <!-- <canvas id="particles-canvas"></canvas> -->
+    <!-- ========================================
+         🎬 PREMIUM FLOATING VIDEO BACKGROUND - LANDING PAGE ONLY
+         ======================================== -->
+    <div class="video-background" id="videoBackground">
+        <video autoplay muted loop playsinline preload="metadata">
+            <source src="{% static 'images/frontvideo.mp4' %}" type="video/mp4">
+        </video>
+        <!-- Optional particle overlay for premium effect -->
+        <div class="particles"></div>
+    </div>
 
     <!-- Navigation -->
     <nav class="navbar">
@@ -638,5 +656,52 @@
         });
     </script>
     -->
+    
+    <!-- DEBUG: Video Background Status -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🎬 DEBUG: Checking video background...');
+            
+            const videoBackground = document.getElementById('videoBackground');
+            const video = videoBackground?.querySelector('video');
+            
+            if (videoBackground) {
+                console.log('✅ Video background div found:', videoBackground);
+            } else {
+                console.log('❌ Video background div NOT found');
+            }
+            
+            if (video) {
+                console.log('✅ Video element found:', video);
+                console.log('📹 Video src:', video.src);
+                console.log('🎮 Video autoplay:', video.autoplay);
+                console.log('🔇 Video muted:', video.muted);
+                console.log('🔄 Video loop:', video.loop);
+                
+                // Force video to be visible
+                video.style.opacity = '1';
+                video.style.zIndex = '-1';
+                video.style.filter = 'none';
+                
+                video.addEventListener('loadstart', () => console.log('📥 Video loading started'));
+                video.addEventListener('loadeddata', () => console.log('✅ Video data loaded'));
+                video.addEventListener('canplay', () => console.log('▶️ Video can start playing'));
+                video.addEventListener('playing', () => console.log('🎬 Video is playing'));
+                video.addEventListener('error', (e) => console.log('❌ Video error:', e));
+                
+                // Try to play the video
+                video.play().then(() => {
+                    console.log('✅ Video play() succeeded');
+                }).catch((error) => {
+                    console.log('❌ Video play() failed:', error);
+                });
+            } else {
+                console.log('❌ Video element NOT found');
+            }
+        });
+    </script>
+    
+    <!-- Floating Video Background JavaScript - Landing Page Only -->
+    <script src="{% static 'js/floating-video-background.js' %}"></script>
 </body>
 </html>

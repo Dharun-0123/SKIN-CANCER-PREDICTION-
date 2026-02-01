@@ -1,0 +1,218 @@
+/* ========================================
+   🎬 PREMIUM FLOATING VIDEO BACKGROUND
+   ======================================== */
+
+/* Video Background Container */
+.video-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -2;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+/* Main Background Video */
+.video-background video {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    transform: translate(-50%, -50%);
+    object-fit: cover;
+    opacity: 0.6; /* Increased from 0.15 to make video visible */
+    filter: blur(0.5px) brightness(0.8) contrast(1.1); /* Increased brightness */
+    animation: floatingVideo 20s ease-in-out infinite;
+    will-change: transform;
+}
+
+/* Floating Animation - Subtle and Cinematic */
+@keyframes floatingVideo {
+    0% {
+        transform: translate(-50%, -50%) scale(1.02);
+    }
+    25% {
+        transform: translate(-50%, -52%) scale(1.03);
+    }
+    50% {
+        transform: translate(-50%, -48%) scale(1.01);
+    }
+    75% {
+        transform: translate(-50%, -51%) scale(1.025);
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1.02);
+    }
+}
+
+/* Premium Overlay Gradients */
+.video-background::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        radial-gradient(circle at 20% 30%, rgba(168, 85, 247, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(6, 182, 212, 0.06) 0%, transparent 50%),
+        linear-gradient(135deg, rgba(10, 10, 15, 0.7) 0%, rgba(18, 18, 26, 0.8) 100%);
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* Cinematic Vignette Effect */
+.video-background::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(
+        ellipse at center,
+        transparent 0%,
+        transparent 40%,
+        rgba(10, 10, 15, 0.3) 70%,
+        rgba(10, 10, 15, 0.6) 100%
+    );
+    z-index: 2;
+    pointer-events: none;
+}
+
+/* Performance Optimizations */
+.video-background video {
+    backface-visibility: hidden;
+    perspective: 1000px;
+    transform-style: preserve-3d;
+}
+
+/* Mobile Optimizations */
+@media (max-width: 768px) {
+    .video-background video {
+        opacity: 0.4; /* Increased from 0.08 for visibility */
+        filter: blur(2px) brightness(0.6) contrast(1.1); /* Increased brightness */
+        animation-duration: 25s; /* Slower on mobile for better performance */
+    }
+    
+    /* Reduce animation complexity on mobile */
+    @keyframes floatingVideo {
+        0%, 100% {
+            transform: translate(-50%, -50%) scale(1.01);
+        }
+        50% {
+            transform: translate(-50%, -51%) scale(1.02);
+        }
+    }
+}
+
+/* Tablet Optimizations */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .video-background video {
+        opacity: 0.5; /* Increased from 0.12 for visibility */
+        animation-duration: 22s;
+    }
+}
+
+/* High-end Desktop - Enhanced Effect */
+@media (min-width: 1440px) {
+    .video-background video {
+        opacity: 0.7; /* Increased from 0.18 for visibility */
+        filter: blur(0.5px) brightness(0.9) contrast(1.2); /* Increased brightness */
+    }
+    
+    @keyframes floatingVideo {
+        0% {
+            transform: translate(-50%, -50%) scale(1.02) rotateZ(0deg);
+        }
+        20% {
+            transform: translate(-50%, -52%) scale(1.035) rotateZ(0.2deg);
+        }
+        40% {
+            transform: translate(-50%, -48%) scale(1.01) rotateZ(-0.1deg);
+        }
+        60% {
+            transform: translate(-50%, -51%) scale(1.028) rotateZ(0.15deg);
+        }
+        80% {
+            transform: translate(-50%, -49%) scale(1.015) rotateZ(-0.05deg);
+        }
+        100% {
+            transform: translate(-50%, -50%) scale(1.02) rotateZ(0deg);
+        }
+    }
+}
+
+/* Accessibility - Respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+    .video-background video {
+        animation: none !important;
+        transform: translate(-50%, -50%) scale(1) !important;
+    }
+}
+
+/* Dark Mode Enhancement */
+@media (prefers-color-scheme: dark) {
+    .video-background video {
+        opacity: 0.5; /* Increased from 0.12 for visibility */
+        filter: blur(1px) brightness(0.7) contrast(1.3); /* Increased brightness */
+    }
+}
+
+/* Loading State */
+.video-background.loading video {
+    opacity: 0;
+    transition: opacity 2s ease-in-out;
+}
+
+.video-background.loaded video {
+    opacity: 0.6; /* Updated to match the main video opacity */
+}
+
+/* Fallback for browsers that don't support video */
+.no-video .video-background {
+    background: 
+        radial-gradient(circle at 20% 30%, rgba(168, 85, 247, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(6, 182, 212, 0.04) 0%, transparent 50%),
+        linear-gradient(135deg, rgba(10, 10, 15, 0.9) 0%, rgba(18, 18, 26, 0.95) 100%);
+}
+
+/* Premium Particle Effect Overlay (Optional Enhancement) */
+.video-background .particles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        radial-gradient(2px 2px at 20px 30px, rgba(168, 85, 247, 0.1), transparent),
+        radial-gradient(2px 2px at 40px 70px, rgba(6, 182, 212, 0.08), transparent),
+        radial-gradient(1px 1px at 90px 40px, rgba(255, 255, 255, 0.05), transparent),
+        radial-gradient(1px 1px at 130px 80px, rgba(168, 85, 247, 0.06), transparent);
+    background-repeat: repeat;
+    background-size: 150px 100px;
+    animation: particleFloat 30s linear infinite;
+    opacity: 0.3;
+    z-index: 3;
+}
+
+@keyframes particleFloat {
+    0% {
+        transform: translateY(0px);
+    }
+    100% {
+        transform: translateY(-100px);
+    }
+}
+
+/* Hide particles on mobile for performance */
+@media (max-width: 768px) {
+    .video-background .particles {
+        display: none;
+    }
+}
